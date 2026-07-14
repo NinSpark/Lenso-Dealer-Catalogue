@@ -1,0 +1,492 @@
+<div *ngIf="isLoadingShare" class="loading-share-container d-flex text-align-center">
+    <div>
+        <mat-spinner diameter="100"></mat-spinner>
+        <div id="share-msg">{{shareMsg}}</div>
+    </div>
+</div>
+
+<div *ngIf="showBackToTop" class="back-to-top-button">
+    <button matSuffix mat-icon-button (click)="scrollToTop()">
+        <mat-icon>arrow_upward</mat-icon>
+    </button>
+</div>
+
+<div *ngIf="!isLoadingShare" class="body">
+    <div class="first-row">
+        <mat-form-field class="search-form-field">
+            <mat-label>Search Wheel Keyword</mat-label>
+            <input matInput placeholder="e.g. V1N" [(ngModel)]="searchRimText" (ngModelChange)="onSearchChange($event)"
+                [ngModelOptions]="{updateOn: 'change'}" #searchbar>
+            <button *ngIf="searchRimText" matSuffix mat-icon-button aria-label="Clear"
+                (click)="searchRimText = ''; applyFilter()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
+
+        <button mat-icon-button [matMenuTriggerFor]="sortMenu" class="more-option-button" [disabled]="isLoading">
+            <mat-icon>swap_vert</mat-icon>
+        </button>
+        <mat-menu #sortMenu="matMenu">
+            <button mat-menu-item (click)="sortBy('newest')">
+                <mat-icon [style.visibility]="currentSort === 'newest' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Sort by Newest</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('oldest')">
+                <mat-icon [style.visibility]="currentSort === 'oldest' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Sort by Oldest</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('az')">
+                <mat-icon [style.visibility]="currentSort === 'az' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Sort A - Z</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('za')">
+                <mat-icon [style.visibility]="currentSort === 'za' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Sort Z - A</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('lightest')">
+                <mat-icon [style.visibility]="currentSort === 'lightest' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Sort by Lightest</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('heaviest')">
+                <mat-icon [style.visibility]="currentSort === 'heaviest' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Sort by Heaviest</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('priceHigh')">
+                <mat-icon [style.visibility]="currentSort === 'priceHigh' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Price: High - Low</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('priceLow')">
+                <mat-icon [style.visibility]="currentSort === 'priceLow' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Price: Low - High</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('qtyHigh')">
+                <mat-icon [style.visibility]="currentSort === 'qtyHigh' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Qty: High - Low</span>
+            </button>
+
+            <button mat-menu-item (click)="sortBy('qtyLow')">
+                <mat-icon [style.visibility]="currentSort === 'qtyLow' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Qty: Low - High</span>
+            </button>
+        </mat-menu>
+
+        <button matIconButton [matMenuTriggerFor]="menu" class="more-option-button">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button *ngIf="fullItemList.data.length == 0" mat-menu-item (click)="applyFilter()" [disabled]="isLoading">
+                <mat-icon>visibility</mat-icon>
+                <span>Show All</span>
+            </button>
+            <button *ngIf="fullItemList.data.length > 0" mat-menu-item (click)="clearList()" [disabled]="isLoading">
+                <mat-icon>refresh</mat-icon>
+                <span>Reset List</span>
+            </button>
+            <button mat-menu-item (click)="shareSelectedImages()"
+                [disabled]="selectedItems.length == 0 || isLoading || (!isMobileView && !isTabletView)">
+                <mat-icon>share</mat-icon>
+                <span>Share Image</span>
+            </button>
+            <button mat-menu-item (click)="exportToPDF()" [disabled]="selectedItems.length == 0 || isLoading">
+                <img src="assets/export.svg" style="width: 24px; height: 24px; margin-right: 16px" />
+                <span>Share PDF</span>
+            </button>
+            <button mat-menu-item (click)="selectAll()" [disabled]="isLoading">
+                <!-- <mat-icon *ngIf="selectedItems.length == 0">playlist_add_check</mat-icon>
+                <span *ngIf="selectedItems.length == 0">Select All</span>
+                <mat-icon *ngIf="selectedItems.length > 0">playlist_remove</mat-icon>
+                <span *ngIf="selectedItems.length > 0">Deselect All</span> -->
+                <ng-container>
+                    @if (selectedItems.length == 0) {
+                    <mat-icon>playlist_add_check</mat-icon>
+                    <span>Select All</span>
+                    }
+                    @else if (selectedItems.length > 0) {
+                    <mat-icon>playlist_remove</mat-icon>
+                    <span>Deselect All</span>
+                    }
+                </ng-container>
+            </button>
+            <button mat-menu-item (click)="logout()">
+                <mat-icon>logout</mat-icon>
+                <span>Log out</span>
+            </button>
+        </mat-menu>
+    </div>
+
+    <mat-accordion>
+        <mat-expansion-panel #filterPanel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Filter Options</mat-panel-title>
+                <mat-panel-description>
+                    Size | Type | P.C.D.
+                    <mat-icon>tune</mat-icon>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="filter-select-options">
+                <div class="filter-select-form">
+                    <mat-form-field>
+                        <mat-label>Size</mat-label>
+                        <mat-select [formControl]="selectedSize" multiple>
+                            <mat-select-trigger>
+                                {{ getSelectedSizeText() }}
+                            </mat-select-trigger>
+                            <mat-option #allSize value="all-size" (click)="toggleAllSize(allSize)">All
+                                Sizes</mat-option>
+                            <mat-option *ngFor="let size of sizeList" [value]="size.value">{{size.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>P.C.D.</mat-label>
+                        <mat-select [formControl]="selectedPCD" multiple>
+                            <mat-select-trigger>
+                                {{ getSelectedPCDText() }}
+                            </mat-select-trigger>
+                            <mat-option #allPCD value="all-pcd" (click)="toggleAllPCD(allPCD)">All PCDs</mat-option>
+                            <mat-option *ngFor="let pcd of pcdList" [value]="pcd.value">{{pcd.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Type</mat-label>
+                        <mat-select [(ngModel)]="selectedType" [disabled]="isLoading">
+                            <mat-option value="all-type">All Type</mat-option>
+                            <mat-option value="CAST">Cast</mat-option>
+                            <mat-option value="FLOW FORM">Flow Form</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <button matButton="filled" color="primary" (click)="applyFilter(); filterPanel.close()"
+                    style="margin-top: 8px;"
+                    [disabled]="selectedPCD.value!.length == 0 || selectedSize.value!.length == 0 || isLoading">
+                    Apply
+                </button>
+
+                <button matButton="outlined" color="warn" (click)="resetFilters(); filterPanel.close()"
+                    [disabled]="isLoading">
+                    Reset
+                </button>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="checkbox-options">
+        <mat-checkbox class="show-cost-checkbox" [(ngModel)]="showCost" [disabled]="isLoading">Show cost</mat-checkbox>
+        <mat-checkbox *ngIf="!hidePriceOption" class="show-price-checkbox" [(ngModel)]="showPrice"
+            [disabled]="isLoading">Show
+            price</mat-checkbox>
+        <mat-checkbox class="show-set-checkbox" [(ngModel)]="isSet" [disabled]="isLoading">Show set</mat-checkbox>
+        <mat-checkbox class="show-oos-checkbox" [(ngModel)]="showOOS" [disabled]="isLoading">Show out of
+            stock</mat-checkbox>
+    </div>
+
+    <ng-container *ngIf="!isMobileView && !isTabletView">
+        <div class="item-shown-message" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
+            {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
+        <div class="item-selected-message">Selected <b style="color: #a01b1f;">{{selectedItems.length}}</b> item(s).
+        </div>
+        <mat-divider class="eof-divider"></mat-divider>
+
+        <div class="desktop-card-div">
+            <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
+                <div *ngIf="showOOS || item.StockQty > 0" [@cardAnim]>
+                    <mat-card [id]="item.ItemCode" (click)="toggleCard(item)"
+                        [style.cursor]="item.imageExist ? 'pointer':'default'"
+                        [ngClass]="{'selected-card': isSelected(item)}">
+                        <div class="card-header-checkbox" [ngClass]="{'highlight-header': isSelected(item)}">
+                            <mat-checkbox class="toggle-card-checkbox" [checked]="isSelected(item)"
+                                [style.pointer-events]="item.imageExist ? 'auto':'none'"></mat-checkbox>
+                            <mat-icon class="placeholder-check" fontIcon="check"
+                                [style.display]="isSelected(item) ? 'none' : 'inline-block'"></mat-icon>
+                        </div>
+                        <div class="text-align-center">
+                            <div class="image-container">
+                                <div *ngIf="!item.imageLoaded" class="wheel-image-loading d-flex">
+                                    <mat-spinner diameter="70"></mat-spinner>
+                                </div>
+
+                                <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
+                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                            </div>
+
+                            <p class="item-description"><b>{{ item.Description }}</b></p>
+                            <p class="code-name">{{ item.ItemCode }}</p>
+                        </div>
+
+                        <mat-card-content>
+                            <div class="desktop-info-qty">
+                                <div class="info-details">
+                                    <div class="type-info">
+                                        <mat-icon fontIcon="hardware"></mat-icon>
+                                        <div>{{ item.ItemClass | titlecase }}</div>
+                                    </div>
+                                    <div class="pcd-info">
+                                        <img src="assets/PCD-01-02-01.svg"
+                                            style="width: 24px; height: 24px; margin: 0" />
+                                        <div>{{ item.ItemCategory }}</div>
+                                    </div>
+                                    <div class="weight-info">
+                                        <img src="assets/weight_filled.svg"
+                                            style="width: 24px; height: 24px; margin: 0" />
+                                        <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
+                                        <div *ngIf="item.Weight == -1">N/A</div>
+                                    </div>
+                                </div>
+                                <div class="qty-section">
+                                    <div class="current-qty">
+                                        <div
+                                            style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
+                                            <div style="padding: 8px 0 4px 0;">
+                                                <div>{{ item.StockQty }}</div>
+                                                <div style="font-size: 10px;">PCS</div>
+                                            </div>
+                                            <mat-divider *ngIf="isSet" [vertical]="true"
+                                                style="height: 50px;"></mat-divider>
+                                            <div *ngIf="isSet" style="padding: 8px 0 4px 0;">
+                                                <div>{{ calculateSet(item.StockQty) }}</div>
+                                                <div style="font-size: 10px;">SET</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="showPrice" class="current-price">
+                                        <div *ngIf="item.Price == -1">
+                                            <div>N/A</div>
+                                            <div style="font-size: 12px;">Price not available</div>
+                                        </div>
+                                        <div *ngIf="item.Price != -1">
+                                            <div style="font-size: 12px; padding-bottom: 2px;">MYR</div>
+                                            <div style="padding-bottom: 2px;">{{ item.Price * 4 | number:'1.2-2' }}
+                                            </div>
+                                            <div class="set-div">RM {{ item.Price | number:'1.2-2' }} per pcs</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+
+    <!-- Mobile: 1 card per row -->
+    <ng-container *ngIf="isMobileView">
+        <div class="item-shown-message" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
+            {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
+        <div class="item-selected-message">Selected <b style="color: #a01b1f;">{{selectedItems.length}}</b> item(s).
+        </div>
+        <mat-divider class="eof-divider"></mat-divider>
+
+        <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
+            <div *ngIf="showOOS || item.StockQty > 0" [@cardAnim]>
+                <mat-card [id]="item.ItemCode" (click)="toggleCard(item)"
+                    [style.cursor]="item.imageExist ? 'pointer':'default'"
+                    [ngClass]="{'selected-card': isSelected(item)}">
+                    <div class="card-header-checkbox" [ngClass]="{'highlight-header': isSelected(item)}">
+                        <mat-checkbox class="toggle-card-checkbox" [checked]="isSelected(item)"
+                            [style.pointer-events]="item.imageExist ? 'auto':'none'"></mat-checkbox>
+                        <mat-icon class="placeholder-check" fontIcon="check"
+                            [style.display]="isSelected(item) ? 'none' : 'inline-block'"></mat-icon>
+                    </div>
+                    <div class="text-align-center">
+                        <div class="image-container">
+                            <div *ngIf="!item.imageLoaded" class="wheel-image-loading d-flex">
+                                <mat-spinner diameter="70"></mat-spinner>
+                            </div>
+
+                            <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
+                                [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                        </div>
+
+                        <p class="item-description"><b>{{ item.Description }}</b></p>
+                        <p class="code-name">{{ item.ItemCode }}</p>
+                    </div>
+
+                    <mat-card-content>
+                        <div class="mobile-info-qty">
+                            <div class="info-details">
+                                <div class="type-info">
+                                    <mat-icon fontIcon="hardware"></mat-icon>
+                                    <div>{{ item.ItemClass | titlecase }}</div>
+                                </div>
+                                <div class="pcd-info">
+                                    <img src="assets/PCD-01-02-01.svg" style="width: 24px; height: 24px; margin: 0" />
+                                    <div>{{ item.ItemCategory }}</div>
+                                </div>
+                                <div class="weight-info">
+                                    <img src="assets/weight_filled.svg" style="width: 24px; height: 24px; margin: 0" />
+                                    <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
+                                    <div *ngIf="item.Weight == -1">N/A</div>
+                                </div>
+                            </div>
+                            <div class="qty-section">
+                                <div class="current-qty">
+                                    <div
+                                        style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
+                                        <div style="padding: 8px 0 4px 0;">
+                                            <div>{{ item.StockQty }}</div>
+                                            <div style="font-size: 10px;">PCS</div>
+                                        </div>
+                                        <mat-divider *ngIf="isSet" [vertical]="true"
+                                            style="height: 50px;"></mat-divider>
+                                        <div *ngIf="isSet" style="padding: 8px 0 4px 0;">
+                                            <div>{{ calculateSet(item.StockQty) }}</div>
+                                            <div style="font-size: 10px;">SET</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="showPrice" class="current-price">
+                                    <div *ngIf="item.Price == -1">
+                                        <div>N/A</div>
+                                        <div style="font-size: 12px;">Price not available</div>
+                                    </div>
+                                    <div *ngIf="item.Price != -1">
+                                        <div style="font-size: 12px; padding-bottom: 2px;">MYR</div>
+                                        <div style="padding-bottom: 2px;">{{ item.Price * 4 | number:'1.2-2' }}</div>
+                                        <div class="set-div">RM {{ item.Price | number:'1.2-2' }} per pcs</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </ng-container>
+    </ng-container>
+
+    <!-- Tablet: 2 cards per row -->
+    <ng-container *ngIf="isTabletView">
+        <div class="item-shown-message" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
+            {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
+        <div class="item-selected-message">Selected <b style="color: #a01b1f;">{{selectedItems.length}}</b> item(s).
+        </div>
+        <mat-divider class="eof-divider"></mat-divider>
+
+        <div class="tablet-card-div">
+            <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
+                <div *ngIf="showOOS || item.StockQty > 0" [@cardAnim]>
+                    <mat-card [id]="item.ItemCode" (click)="toggleCard(item)"
+                        [style.cursor]="item.imageExist ? 'pointer':'default'"
+                        [ngClass]="{'selected-card': isSelected(item)}">
+                        <div class="card-header-checkbox" [ngClass]="{'highlight-header': isSelected(item)}">
+                            <mat-checkbox class="toggle-card-checkbox" [checked]="isSelected(item)"
+                                [style.pointer-events]="item.imageExist ? 'auto':'none'"></mat-checkbox>
+                            <mat-icon class="placeholder-check" fontIcon="check"
+                                [style.display]="isSelected(item) ? 'none' : 'inline-block'"></mat-icon>
+                        </div>
+                        <div class="text-align-center">
+                            <div class="image-container">
+                                <div *ngIf="!item.imageLoaded" class="wheel-image-loading d-flex">
+                                    <mat-spinner diameter="70"></mat-spinner>
+                                </div>
+
+                                <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
+                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                            </div>
+
+                            <p class="item-description"><b>{{ item.Description }}</b></p>
+                            <p class="code-name">{{ item.ItemCode }}</p>
+                        </div>
+
+                        <mat-card-content>
+                            <div class="tablet-info-qty">
+                                <div class="info-details">
+                                    <div class="type-info">
+                                        <mat-icon fontIcon="hardware"></mat-icon>
+                                        <div>{{ item.ItemClass | titlecase }}</div>
+                                    </div>
+                                    <div class="pcd-info">
+                                        <img src="assets/PCD-01-02-01.svg"
+                                            style="width: 24px; height: 24px; margin: 0" />
+                                        <div>{{ item.ItemCategory }}</div>
+                                    </div>
+                                    <div class="weight-info">
+                                        <img src="assets/weight_filled.svg"
+                                            style="width: 24px; height: 24px; margin: 0" />
+                                        <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
+                                        <div *ngIf="item.Weight == -1">N/A</div>
+                                    </div>
+                                </div>
+                                <div class="qty-section">
+                                    <div class="current-qty">
+                                        <div
+                                            style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
+                                            <div style="padding: 8px 0 4px 0;">
+                                                <div>{{ item.StockQty }}</div>
+                                                <div style="font-size: 10px;">PCS</div>
+                                            </div>
+                                            <mat-divider *ngIf="isSet" [vertical]="true"
+                                                style="height: 50px;"></mat-divider>
+                                            <div *ngIf="isSet" style="padding: 8px 0 4px 0;">
+                                                <div>{{ calculateSet(item.StockQty) }}</div>
+                                                <div style="font-size: 10px;">SET</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="showPrice" class="current-price">
+                                        <div *ngIf="item.Price == -1">
+                                            <div>N/A</div>
+                                            <div style="font-size: 12px;">Price not available</div>
+                                        </div>
+                                        <div *ngIf="item.Price != -1">
+                                            <div style="font-size: 12px; padding-bottom: 2px;">MYR</div>
+                                            <div style="padding-bottom: 2px;">{{ item.Price * 4 | number:'1.2-2' }}
+                                            </div>
+                                            <div class="set-div">RM {{ item.Price | number:'1.2-2' }} per pcs</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+
+    <div *ngIf="(isLoading || !isStockCountReady) && !isInitial"
+        class="loading-container no-entries-message d-flex text-align-center">
+        <div>
+            <mat-spinner diameter="70"></mat-spinner>
+            <div style="margin-top: 20px;">Querying Lenso database...</div>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && !showOOS && (emptyStockCount > 0) && fullStockCount == 0 && isStockCountReady"
+        class="loading-container no-entries-message d-flex text-align-center">
+        <div class="opaque-msg">
+            <img src="assets/inventory.png" class="msg-icon">
+            <div>Only Out of Stock item(s) result found</div>
+        </div>
+    </div>
+
+    <div *ngIf="fullItemList.data.length === 0 && !isLoading" class="d-flex text-align-center no-entries-message">
+        <div *ngIf="searchRimText.trim() != '' && !isInitial" class="opaque-msg">
+            <img src="assets/box.png" class="msg-icon">
+            <div>No matching results. Try different search or filters.</div>
+        </div>
+        <div *ngIf="searchRimText.trim() == '' && isInitial" class="opaque-msg">
+            <img src="assets/magnifier.png" class="msg-icon">
+            <div>Find wheels by search or filter.</div>
+        </div>
+    </div>
+
+    <div class="eof text-align-center">E.O.F.</div>
+    <mat-divider class="eof-divider"></mat-divider>
+</div>

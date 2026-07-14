@@ -1,0 +1,125 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+    --primary-color: #000000;
+    --accent-color: #a01b1f;
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --mdc-theme-primary: #000000;
+    --mdc-theme-secondary: #a01b1f;
+    --mdc-theme-on-primary: #ffffff;
+    --mdc-theme-on-secondary: #ffffff;
+}
+
+html,
+body {
+    height: 100%;
+    --mat-sys-primary: #a01b1f !important;
+    --mat-sys-surface-tint: #a01b1f !important;
+    --mat-sys-primary-container: #ffd7d7 !important;
+    --mat-sys-primary-fixed: #ffd7d7 !important;
+    --mat-form-field-filled-focus-active-indicator-color: #a01b1f !important;
+    --mat-form-field-filled-focus-label-text-color: #a01b1f !important;
+    --mat-option-selected-state-label-text-color: #a01b1f !important;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.mat-mdc-raised-button {
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+}
+
+.mat-mdc-raised-button.mat-accent {
+    background-color: var(--accent-color) !important;
+    color: #fff !important;
+}
+
+html .mat-accent {
+    --mat-progress-spinner-active-indicator-color: var(--accent-color) !important;
+    --mat-slider-active-track-color: #a01b1f;
+    --mat-slider-focus-handle-color: #a01b1f;
+    --mat-slider-focus-state-layer-color: rgba(255, 64, 129, 0.2);
+    --mat-slider-handle-color: #a01b1f;
+    --mat-slider-hover-handle-color: #a01b1f;
+    --mat-slider-hover-state-layer-color: rgba(255, 64, 129, 0.05);
+    --mat-slider-inactive-track-color: #a01b1f;
+    --mat-slider-ripple-color: #a01b1f;
+    --mat-slider-with-tick-marks-active-container-color: white;
+    --mat-slider-with-tick-marks-inactive-container-color: #a01b1f;
+}
+
+.mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
+.mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
+    border-color: #a01b1f !important;
+    background-color: #a01b1f !important;
+}
+
+.mdc-checkbox .mdc-checkbox__native-control:focus:checked+.mdc-checkbox__ripple {
+    opacity: var(--mat-checkbox-selected-focus-state-layer-opacity, var(--mat-sys-focus-state-layer-opacity));
+    background-color: #a01b1f !important;
+}
+
+.mat-mdc-form-field-subscript-wrapper.mat-mdc-form-field-bottom-align {
+    display: none;
+}
+
+.mat-mdc-card-content:last-child {
+    padding-bottom: 4px !important;
+}
+
+mat-divider {
+    --mat-divider-width: 2px;
+}
+
+.mat-expansion-panel-body {
+    padding: 0 12px !important;
+}
+
+.mat-expansion-panel-header-description {
+    justify-content: space-between !important;
+}
+
+.mat-mdc-menu-item-text {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.mat-mdc-unelevated-button:not(:disabled),
+.mat-pseudo-checkbox-full.mat-pseudo-checkbox-checked,
+.mat-pseudo-checkbox-full.mat-pseudo-checkbox-indeterminate {
+    background-color: #a01b1f !important;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-select-arrow {
+    color: #a01b1f !important;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
+    caret-color: #a01b1f !important;
+}
+
+mat-card .mdc-checkbox .mdc-checkbox__background {
+    background-color: transparent !important;
+    /* grey background when unchecked */
+    border-color: transparent !important;
+}
+
+mat-card .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
+mat-card .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
+    border-color: transparent !important;
+    background-color: transparent !important;
+}
+
+.mat-mdc-progress-spinner .mdc-circular-progress__determinate-circle,
+.mat-mdc-progress-spinner .mdc-circular-progress__indeterminate-circle-graphic {
+    stroke: #a01b1f !important;
+}
+
+.mat-mdc-progress-bar {
+    --mat-progress-bar-active-indicator-color: #a01b1f;
+    --mat-progress-bar-track-color: rgba(160, 27, 31, 0.25);
+}
