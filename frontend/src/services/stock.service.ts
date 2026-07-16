@@ -14,7 +14,7 @@ export class StockService {
     private itemPCDUrl = `${this.domain}/api/item-category`;
     private filteredItemApiUrl = `${this.domain}/api/filtered-item`;
     private stockApiUrl = `${this.domain}/api/stock`;
-    private priceApiUrl = `${this.domain}/api/item-price`;
+    private weightApiUrl = `${this.domain}/api/item-weight`;
     private getSecuredLoginUrl = `${this.domain}/secured-sales-login`;
 
     constructor(private http: HttpClient) { }
@@ -41,9 +41,9 @@ export class StockService {
         return this.http.get<any[]>(url);
     }
 
-    getPriceList(isLensoDB?: boolean): Observable<any[]> {
+    getWeightList(isLensoDB?: boolean): Observable<any[]> {
         const dbParam = isLensoDB ? 'lenso' : 'kai_shen';
-        const url = `${this.priceApiUrl}?db=${dbParam}`;
+        const url = `${this.weightApiUrl}?db=${dbParam}`;
         return this.http.get<any[]>(url);
     }
 

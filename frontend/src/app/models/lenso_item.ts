@@ -57,6 +57,7 @@ export class LensoItem {
     public MustGenerateEInvoice: boolean,
     public ImageFileName: string,
     public StockQty: number,
+    public QtyStatus: string,
     public Cost: number,
     public Price: number,
     public Weight: number,

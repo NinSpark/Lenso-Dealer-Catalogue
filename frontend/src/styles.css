@@ -123,3 +123,7 @@ mat-card .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__back
     --mat-progress-bar-active-indicator-color: #a01b1f;
     --mat-progress-bar-track-color: rgba(160, 27, 31, 0.25);
 }
+
+.mat-badge-content {
+    background-color: #a01b1f !important;
+}

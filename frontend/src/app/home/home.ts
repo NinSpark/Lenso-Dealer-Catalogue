@@ -6,7 +6,7 @@ import { LensoStock } from '../models/lenso_stock';
 import { LensoItem } from '../models/lenso_item';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { LensoPrice } from '../models/lenso_price';
+import { LensoWeight } from '../models/lenso_weight';
 import jsPDF from 'jspdf';
 import { MaterialModule } from '../shared/material.module';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -51,12 +51,11 @@ export class Home implements OnInit {
   private searchSub: any;
   shareMsg: string = '';
 
-  fullStockList: LensoStock[] = [];
   fullItemList = new MatTableDataSource<LensoItem>();
   isSet: boolean = true;
   showCost: boolean = false;
   showPrice: boolean = true;
-  showOOS: boolean = false;
+  showOOS: boolean = true;
   isMobileView: boolean = true;
   isTabletView: boolean = false;
   showBackToTop: boolean = false;
@@ -218,20 +217,6 @@ export class Home implements OnInit {
       case 'oldest':
         this.fullItemList.data.sort((a, b) => a.ItemCode.localeCompare(b.ItemCode));
         break;
-      case 'priceHigh':
-        this.fullItemList.data.sort((a, b) => {
-          const aPrice = (a.Price != null && a.Price >= 0) ? a.Price : -Infinity;
-          const bPrice = (b.Price != null && b.Price >= 0) ? b.Price : -Infinity;
-          return bPrice - aPrice;
-        });
-        break;
-      case 'priceLow':
-        this.fullItemList.data.sort((a, b) => {
-          const aPrice = (a.Price != null && a.Price >= 0) ? a.Price : Infinity;
-          const bPrice = (b.Price != null && b.Price >= 0) ? b.Price : Infinity;
-          return aPrice - bPrice;
-        });
-        break;
       case 'qtyHigh':
         this.fullItemList.data.sort((a, b) => b.StockQty - a.StockQty);
         break;
@@ -256,13 +241,14 @@ export class Home implements OnInit {
   }
 
   resetFilters(): void {
+    this.selectedItems = [];
     this.selectedType = 'all-type';
     this.selectedSize.setValue(['all-size', ...this.sizeList.map(size => size.value)]);
     this.selectedPCD.setValue(['all-pcd', ...this.pcdList.map(pcd => pcd.value)]);
     this.showCost = false;
     this.showPrice = true;
     this.isSet = true;
-    this.showOOS = false;
+    this.showOOS = true;
     this.searchRimText = '';
 
     this.applyFilter();
@@ -270,13 +256,14 @@ export class Home implements OnInit {
 
   clearList(): void {
     this.isInitial = true;
+    this.selectedItems = [];
     this.selectedType = 'all-type';
     this.selectedSize.setValue(['all-size', ...this.sizeList.map(size => size.value)]);
     this.selectedPCD.setValue(['all-pcd', ...this.pcdList.map(pcd => pcd.value)]);
     this.showCost = false;
     this.showPrice = false;
     this.isSet = false;
-    this.showOOS = false;
+    this.showOOS = true;
     this.searchRimText = '';
 
     this.fullItemList.data = [];
@@ -296,49 +283,37 @@ export class Home implements OnInit {
   }
 
   async fetchPriceAndWeight(): Promise<void> {
-    try {
-      this.stockService.getPriceList(this.isLensoDB).subscribe((data: LensoPrice[]) => {
-        this.fullItemList.data.forEach((item: LensoItem) => {
-          let price = data.find((itemPrice) => itemPrice.ItemCode == item.ItemCode)?.Price;
-          if (price) {
-            item.Price = price;
-          }
-          else {
-            item.Price = -1;
-          }
+    this.stockService.getWeightList(this.isLensoDB).subscribe({
+      next: (data: LensoWeight[]) => {
+        const weightMap = new Map(
+          data.map(weight => [weight.ItemCode, weight])
+        );
 
-          let weight = data.find((itemWeight) => itemWeight.ItemCode == item.ItemCode)?.Weight;
-          if (weight) {
-            item.Weight = weight;
-          }
-          else {
-            item.Weight = -1;
-          }
+        this.fullItemList.data.forEach((item: LensoItem) => {
+          const itemWeight = weightMap.get(item.ItemCode);
+
+          item.Weight = itemWeight?.Weight ?? -1;
         });
 
         this.fetchStocks();
-      });
-    } catch (error) {
-      console.error('Error fetching prices:', error);
-    }
+      },
+      error: (err) => {
+        console.error('Error fetching details:', err);
+      }
+    });
   }
 
   async fetchStocks(): Promise<void> {
-    try {
-      this.stockService.getStockList(this.isLensoDB).subscribe((data: LensoStock[]) => {
-        this.fullStockList = data;
+    this.stockService.getStockList(this.isLensoDB).subscribe({
+      next: (data: LensoStock[]) => {
+        const stockMap = new Map(
+          data.map(stock => [stock.ItemCode, stock])
+        );
 
         this.fullItemList.data.forEach((item: LensoItem) => {
-          item.StockQty = 0;
-          item.Cost = 0;
-
-          let currentItemList = this.fullStockList.filter((stock: LensoStock) => stock.ItemCode === item.ItemCode);
-          currentItemList.forEach((currentItem) => {
-            item.StockQty += currentItem.Qty;
-          });
-
-          if (currentItemList.length > 0) {
-            item.Cost = currentItemList[0].Cost;
+          const stock = stockMap.get(item.ItemCode);
+          if (stock) {
+            item.QtyStatus = stock.QtyStatus;
           }
         });
 
@@ -346,10 +321,11 @@ export class Home implements OnInit {
         this.fullStockCount = this.inStockCount();
         this.emptyStockCount = this.fullItemList.data.length - this.fullStockCount;
         this.isStockCountReady = true;
-      });
-    } catch (error) {
-      console.error('Error fetching stocks:', error);
-    }
+      },
+      error: (err) => {
+        console.error('Error fetching stocks:', err);
+      }
+    });
   }
 
   initializeFilter() {

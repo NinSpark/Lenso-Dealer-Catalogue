@@ -23,6 +23,9 @@
             </button>
         </mat-form-field>
 
+        <button mat-icon-button [disabled]="selectedItems.length == 0 || isLoading">
+            <mat-icon [matBadge]="selectedItems.length" [matBadgeHidden]="selectedItems.length == 0">send</mat-icon>
+        </button>
         <button mat-icon-button [matMenuTriggerFor]="sortMenu" class="more-option-button" [disabled]="isLoading">
             <mat-icon>swap_vert</mat-icon>
         </button>
@@ -55,16 +58,6 @@
             <button mat-menu-item (click)="sortBy('heaviest')">
                 <mat-icon [style.visibility]="currentSort === 'heaviest' ? 'visible' : 'hidden'">check</mat-icon>
                 <span>Sort by Heaviest</span>
-            </button>
-
-            <button mat-menu-item (click)="sortBy('priceHigh')">
-                <mat-icon [style.visibility]="currentSort === 'priceHigh' ? 'visible' : 'hidden'">check</mat-icon>
-                <span>Price: High - Low</span>
-            </button>
-
-            <button mat-menu-item (click)="sortBy('priceLow')">
-                <mat-icon [style.visibility]="currentSort === 'priceLow' ? 'visible' : 'hidden'">check</mat-icon>
-                <span>Price: Low - High</span>
             </button>
 
             <button mat-menu-item (click)="sortBy('qtyHigh')">
@@ -100,10 +93,6 @@
                 <span>Share PDF</span>
             </button>
             <button mat-menu-item (click)="selectAll()" [disabled]="isLoading">
-                <!-- <mat-icon *ngIf="selectedItems.length == 0">playlist_add_check</mat-icon>
-                <span *ngIf="selectedItems.length == 0">Select All</span>
-                <mat-icon *ngIf="selectedItems.length > 0">playlist_remove</mat-icon>
-                <span *ngIf="selectedItems.length > 0">Deselect All</span> -->
                 <ng-container>
                     @if (selectedItems.length == 0) {
                     <mat-icon>playlist_add_check</mat-icon>
@@ -180,22 +169,10 @@
         </mat-expansion-panel>
     </mat-accordion>
 
-    <div class="checkbox-options">
-        <mat-checkbox class="show-cost-checkbox" [(ngModel)]="showCost" [disabled]="isLoading">Show cost</mat-checkbox>
-        <mat-checkbox *ngIf="!hidePriceOption" class="show-price-checkbox" [(ngModel)]="showPrice"
-            [disabled]="isLoading">Show
-            price</mat-checkbox>
-        <mat-checkbox class="show-set-checkbox" [(ngModel)]="isSet" [disabled]="isLoading">Show set</mat-checkbox>
-        <mat-checkbox class="show-oos-checkbox" [(ngModel)]="showOOS" [disabled]="isLoading">Show out of
-            stock</mat-checkbox>
-    </div>
-
     <ng-container *ngIf="!isMobileView && !isTabletView">
-        <div class="item-shown-message" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
-        <div class="item-shown-message" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
+        <div class="item-shown-message" style="margin-top: 12px;" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" *ngIf="!showOOS" style="margin-top: 12px;">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
-        <div class="item-selected-message">Selected <b style="color: #a01b1f;">{{selectedItems.length}}</b> item(s).
-        </div>
         <mat-divider class="eof-divider"></mat-divider>
 
         <div class="desktop-card-div">
@@ -248,29 +225,12 @@
                                     <div class="current-qty">
                                         <div
                                             style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
-                                            <div style="padding: 8px 0 4px 0;">
-                                                <div>{{ item.StockQty }}</div>
-                                                <div style="font-size: 10px;">PCS</div>
-                                            </div>
-                                            <mat-divider *ngIf="isSet" [vertical]="true"
-                                                style="height: 50px;"></mat-divider>
-                                            <div *ngIf="isSet" style="padding: 8px 0 4px 0;">
-                                                <div>{{ calculateSet(item.StockQty) }}</div>
-                                                <div style="font-size: 10px;">SET</div>
-                                            </div>
+                                            <!-- <button matButton="tonal">Add to Cart</button> -->
                                         </div>
                                     </div>
-                                    <div *ngIf="showPrice" class="current-price">
-                                        <div *ngIf="item.Price == -1">
-                                            <div>N/A</div>
-                                            <div style="font-size: 12px;">Price not available</div>
-                                        </div>
-                                        <div *ngIf="item.Price != -1">
-                                            <div style="font-size: 12px; padding-bottom: 2px;">MYR</div>
-                                            <div style="padding-bottom: 2px;">{{ item.Price * 4 | number:'1.2-2' }}
-                                            </div>
-                                            <div class="set-div">RM {{ item.Price | number:'1.2-2' }} per pcs</div>
-                                        </div>
+                                    <div class="current-price">
+
+                                        <div>{{item.QtyStatus}}</div>
                                     </div>
                                 </div>
                             </div>
@@ -283,11 +243,9 @@
 
     <!-- Mobile: 1 card per row -->
     <ng-container *ngIf="isMobileView">
-        <div class="item-shown-message" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
-        <div class="item-shown-message" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
+        <div class="item-shown-message" *ngIf="showOOS" style="margin-top: 12px;">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" *ngIf="!showOOS" style="margin-top: 12px;">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
-        <div class="item-selected-message">Selected <b style="color: #a01b1f;">{{selectedItems.length}}</b> item(s).
-        </div>
         <mat-divider class="eof-divider"></mat-divider>
 
         <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
@@ -335,30 +293,10 @@
                             </div>
                             <div class="qty-section">
                                 <div class="current-qty">
-                                    <div
-                                        style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
-                                        <div style="padding: 8px 0 4px 0;">
-                                            <div>{{ item.StockQty }}</div>
-                                            <div style="font-size: 10px;">PCS</div>
-                                        </div>
-                                        <mat-divider *ngIf="isSet" [vertical]="true"
-                                            style="height: 50px;"></mat-divider>
-                                        <div *ngIf="isSet" style="padding: 8px 0 4px 0;">
-                                            <div>{{ calculateSet(item.StockQty) }}</div>
-                                            <div style="font-size: 10px;">SET</div>
-                                        </div>
-                                    </div>
+                                    <!-- <button matButton="tonal">Add to Cart</button> -->
                                 </div>
-                                <div *ngIf="showPrice" class="current-price">
-                                    <div *ngIf="item.Price == -1">
-                                        <div>N/A</div>
-                                        <div style="font-size: 12px;">Price not available</div>
-                                    </div>
-                                    <div *ngIf="item.Price != -1">
-                                        <div style="font-size: 12px; padding-bottom: 2px;">MYR</div>
-                                        <div style="padding-bottom: 2px;">{{ item.Price * 4 | number:'1.2-2' }}</div>
-                                        <div class="set-div">RM {{ item.Price | number:'1.2-2' }} per pcs</div>
-                                    </div>
+                                <div class="current-price">
+                                    <div>Water</div>
                                 </div>
                             </div>
                         </div>
@@ -370,11 +308,9 @@
 
     <!-- Tablet: 2 cards per row -->
     <ng-container *ngIf="isTabletView">
-        <div class="item-shown-message" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
-        <div class="item-shown-message" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
+        <div class="item-shown-message" style="margin-top: 12px;" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" style="margin-top: 12px;" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
-        <div class="item-selected-message">Selected <b style="color: #a01b1f;">{{selectedItems.length}}</b> item(s).
-        </div>
         <mat-divider class="eof-divider"></mat-divider>
 
         <div class="tablet-card-div">
@@ -425,31 +361,10 @@
                                 </div>
                                 <div class="qty-section">
                                     <div class="current-qty">
-                                        <div
-                                            style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
-                                            <div style="padding: 8px 0 4px 0;">
-                                                <div>{{ item.StockQty }}</div>
-                                                <div style="font-size: 10px;">PCS</div>
-                                            </div>
-                                            <mat-divider *ngIf="isSet" [vertical]="true"
-                                                style="height: 50px;"></mat-divider>
-                                            <div *ngIf="isSet" style="padding: 8px 0 4px 0;">
-                                                <div>{{ calculateSet(item.StockQty) }}</div>
-                                                <div style="font-size: 10px;">SET</div>
-                                            </div>
-                                        </div>
+                                        <!-- <button matButton="tonal">Add to Cart</button> -->
                                     </div>
-                                    <div *ngIf="showPrice" class="current-price">
-                                        <div *ngIf="item.Price == -1">
-                                            <div>N/A</div>
-                                            <div style="font-size: 12px;">Price not available</div>
-                                        </div>
-                                        <div *ngIf="item.Price != -1">
-                                            <div style="font-size: 12px; padding-bottom: 2px;">MYR</div>
-                                            <div style="padding-bottom: 2px;">{{ item.Price * 4 | number:'1.2-2' }}
-                                            </div>
-                                            <div class="set-div">RM {{ item.Price | number:'1.2-2' }} per pcs</div>
-                                        </div>
+                                    <div class="current-price">
+                                        <div>Water</div>
                                     </div>
                                 </div>
                             </div>

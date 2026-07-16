@@ -161,6 +161,7 @@ app.get('/api/item', authenticateToken, async (req, res) => {
     const query = `SELECT * FROM dbo.Item WHERE ItemCode LIKE 'WA%' AND IsActive = 'T'`;
 
     const result = await request.query(query);
+    console.log(result.recordset)
     res.json(result.recordset);
   } catch (err) {
     console.error('Error fetching stock:', err);
@@ -185,7 +186,7 @@ app.get('/api/item-category', async (req, res) => {
 });
 
 // Fetch item price list
-app.get('/api/item-price', authenticateToken, async (req, res) => {
+app.get('/api/item-weight', authenticateToken, async (req, res) => {
   try {
     const dbType = req.query.db; // 'kai_shen' or 'lenso'
     const pool = await getDBPool(dbType);
@@ -203,13 +204,40 @@ app.get('/api/item-price', authenticateToken, async (req, res) => {
 // Fetch stock list
 app.get('/api/stock', authenticateToken, async (req, res) => {
   try {
-    const dbType = req.query.db; // 'kai_shen' or 'lenso'
+    const dbType = req.query.db;
     const pool = await getDBPool(dbType);
     const request = pool.request();
-    const query = `SELECT * FROM dbo.StockDTL`;
+
+    const query = `
+      SELECT ItemCode,
+      SUM(Qty) AS Qty
+      FROM dbo.StockDTL
+      WHERE ItemCode LIKE 'WA%'
+      GROUP BY ItemCode
+    `;
 
     const result = await request.query(query);
-    res.json(result.recordset);
+
+    const items = result.recordset.map(({ Qty, ...item }) => {
+      let QtyStatus;
+      const qty = parseInt(Qty);
+
+      if (qty <= 0) {
+        QtyStatus = 'Out';
+      } else if (qty <= 8) {
+        QtyStatus = 'Limited';
+      } else {
+        QtyStatus = 'Available';
+      }
+
+      return {
+        ...item,
+        // Qty,
+        QtyStatus
+      };
+    });
+
+    res.json(items);
   } catch (err) {
     console.error('Error fetching stock:', err);
     res.status(500).send('Server error');

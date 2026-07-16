@@ -34,6 +34,7 @@ export class LensoStock {
     public ReportingFIFOCost: number,
     public BalanceFIFO: number,
     public ReportingBalanceFIFO: number,
-    public CFTotalAdjustedCost: number
+    public CFTotalAdjustedCost: number,
+    public QtyStatus: string
   ) { }
 }
