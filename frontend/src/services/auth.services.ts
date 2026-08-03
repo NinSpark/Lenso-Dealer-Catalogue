@@ -15,15 +15,20 @@ export class AuthService {
 
   async login(username: string, password: string): Promise<boolean> {
     try {
+      // const res = await lastValueFrom(
+      //   this.api.getSecuredLoginDetails(username.toUpperCase(), password)
+      // );
+
       const res = await lastValueFrom(
-        this.api.getSecuredLoginDetails(username.toUpperCase(), password)
+        this.api.getDealerSecuredLoginDetails(username.toUpperCase(), password)
       );
 
       if (res?.token) {
         localStorage.setItem('token', res.token);
         localStorage.setItem('loggedInUser', res.username);
-        localStorage.setItem('lensoDivision', res.lenso_division);
-        localStorage.setItem('role', res.role);
+        localStorage.setItem('sales_agent', res.sale_agent);
+        localStorage.setItem('id', res.id);
+        localStorage.setItem('shopping_cart', res.shopping_cart);
         return true;
       }
 
@@ -59,6 +64,18 @@ export class AuthService {
 
   isLensoDivision(): string | null {
     return localStorage.getItem('lensoDivision');
+  }
+
+  getloggedInID(): string | null {
+    return localStorage.getItem('id');
+  }
+
+  getShoppingCart(): string | null {
+    return localStorage.getItem('shopping_cart');
+  }
+
+  getSalesAgent(): string | null {
+    return localStorage.getItem('sales_agent');
   }
 
   isLoggedIn(): boolean {

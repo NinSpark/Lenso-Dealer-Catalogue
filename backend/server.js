@@ -152,13 +152,109 @@ app.post("/secured-sales-login", async (req, res) => {
   }
 });
 
+app.post("/secured-dealer-login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({
+      error: "Username and password are required"
+    });
+  }
+
+  try {
+    const result = await loginPool.query(
+      "SELECT * FROM dealer_login WHERE username = $1",
+      [username]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "User not found"
+      });
+    }
+
+    const user = result.rows[0];
+
+    // const isMatch = await bcrypt.compare(
+    //   password,
+    //   user.password_hash
+    // );
+    const isMatch = password === user.password_hash;
+
+    if (!isMatch) {
+      return res.status(401).json({
+        error: "Invalid password"
+      });
+    }
+
+    // Create JWT
+    const token = jwt.sign(
+      {
+        username: user.username,
+        role: user.role,
+        dealerCode: user.dealer_code
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "30d"
+      }
+    );
+
+    res.json({
+      token,
+      username: user.username,
+      id: user.id,
+      sales_agent: user.sales_agent,
+      shopping_cart: user.shopping_cart,
+    });
+
+  } catch (err) {
+    console.error("Error fetching dealer login:", err);
+
+    res.status(500).json({
+      error: "Internal Server Error"
+    });
+  }
+});
+
+app.put('/api/update-shopping-cart/:id', (req, res) => {
+  const { id } = req.params;
+
+  const {
+    shopping_cart
+  } = req.body;
+
+  const query = `
+        UPDATE dealer_login
+        SET
+            shopping_cart = $1
+        WHERE id = $2
+        RETURNING *;
+    `;
+
+  const values = [
+    shopping_cart,
+    id
+  ];
+
+  loginPool.query(query, values)
+    .then(result => {
+      if (result.rowCount === 0) {
+        res.status(404).json({ message: 'Shopping cart not found' });
+      } else {
+        res.json(result.rows[0]);
+      }
+    })
+    .catch(err => res.status(500).json({ error: err.message }));
+});
+
 // Fetch item list
 app.get('/api/item', authenticateToken, async (req, res) => {
   try {
     const dbType = req.query.db; // 'kai_shen' or 'lenso'
     const pool = await getDBPool(dbType);
     const request = pool.request();
-    const query = `SELECT * FROM dbo.Item WHERE ItemCode LIKE 'WA%' AND IsActive = 'T'`;
+    const query = `SELECT ItemCode, Description, ItemBrand, ItemClass, ItemCategory FROM dbo.Item WHERE ItemCode LIKE 'WA%' AND IsActive = 'T'`;
 
     const result = await request.query(query);
     console.log(result.recordset)
@@ -175,7 +271,7 @@ app.get('/api/item-category', async (req, res) => {
     const dbType = req.query.db; // 'kai_shen' or 'lenso'
     const pool = await getDBPool(dbType);
     const request = pool.request();
-    const query = `SELECT * FROM dbo.ItemCategory WHERE ItemCategory NOT LIKE 'BLANK' ORDER BY ItemCategory ASC`;
+    const query = `SELECT ItemCategory, Description FROM dbo.ItemCategory WHERE ItemCategory NOT LIKE 'BLANK' ORDER BY ItemCategory ASC`;
 
     const result = await request.query(query);
     res.json(result.recordset);
@@ -191,7 +287,7 @@ app.get('/api/item-weight', authenticateToken, async (req, res) => {
     const dbType = req.query.db; // 'kai_shen' or 'lenso'
     const pool = await getDBPool(dbType);
     const request = pool.request();
-    const query = `SELECT * FROM dbo.ItemUOM`;
+    const query = `SELECT ItemCode, UOM, Price, Weight FROM dbo.ItemUOM`;
 
     const result = await request.query(query);
     res.json(result.recordset);
@@ -223,11 +319,11 @@ app.get('/api/stock', authenticateToken, async (req, res) => {
       const qty = parseInt(Qty);
 
       if (qty <= 0) {
-        QtyStatus = 'Out';
+        QtyStatus = 'Unavailable';
       } else if (qty <= 8) {
         QtyStatus = 'Limited';
       } else {
-        QtyStatus = 'Available';
+        QtyStatus = 'In Stock';
       }
 
       return {
@@ -244,7 +340,6 @@ app.get('/api/stock', authenticateToken, async (req, res) => {
   }
 });
 
-// Fetch filtered item list
 app.get('/api/filtered-item', authenticateToken, async (req, res) => {
   try {
     const dbType = req.query.db; // 'kai_shen' or 'lenso'
@@ -252,54 +347,121 @@ app.get('/api/filtered-item', authenticateToken, async (req, res) => {
 
     // Extract and parse filters
     const { type, size, pcd, search } = req.query;
+
     const sizeList = size ? JSON.parse(size) : [];
     const pcdList = pcd ? JSON.parse(pcd) : [];
 
-    let baseQuery = `SELECT * FROM dbo.Item WHERE ItemCode LIKE 'WA%' AND IsActive = 'T'`;
-    let conditions = [];
-    let parameters = {};
+    let baseQuery = `
+      SELECT 
+        ITEM.ItemCode, ITEM.Description, ITEM.ItemBrand, ITEM.ItemClass, ITEM.ItemCategory,
+        SUM(DTL.Qty) AS Qty, COALESCE(UOM.Weight, -1) AS Weight
+      FROM dbo.Item ITEM
+      INNER JOIN dbo.StockDTL DTL ON ITEM.ItemCode = DTL.ItemCode
+      INNER JOIN dbo.ItemUOM UOM ON ITEM.ItemCode = UOM.ItemCode
+      WHERE ITEM.ItemCode LIKE 'WA%' 
+        AND ITEM.IsActive = 'T'
+    `;
 
+    const conditions = [];
+    const parameters = {};
+
+    // Filter by type
     if (type && type !== 'all-type') {
-      conditions.push(`ItemClass = @type`);
+      conditions.push(`ITEM.ItemClass = @type`);
       parameters.type = type;
     }
 
+    // Filter by size
     if (sizeList.length > 0) {
-      conditions.push(
-        `(${sizeList
-          .map((_, i) => `LEFT(ItemBrand, CHARINDEX('X', ItemBrand) - 1) = @size${i}`)
-          .join(' OR ')})`
-      );
+      conditions.push(`
+        (
+          ${sizeList
+          .map(
+            (_, i) =>
+              `LEFT(ITEM.ItemBrand, CHARINDEX('X', ITEM.ItemBrand) - 1) = @size${i}`
+          )
+          .join(' OR ')}
+        )
+      `);
+
       sizeList.forEach((val, i) => {
         parameters[`size${i}`] = val;
       });
     }
 
+    // Filter by PCD
     if (pcdList.length > 0) {
-      conditions.push(
-        `(${pcdList.map((_, i) => `ItemCategory = @pcd${i}`).join(' OR ')})`
-      );
+      conditions.push(`
+        (
+          ${pcdList
+          .map((_, i) => `ITEM.ItemCategory = @pcd${i}`)
+          .join(' OR ')}
+        )
+      `);
+
       pcdList.forEach((val, i) => {
         parameters[`pcd${i}`] = val;
       });
     }
 
+    // Search
     if (search && search.trim() !== '') {
-      conditions.push(`(ItemCode LIKE @search OR Description LIKE @search OR ItemType LIKE @search)`);
-      parameters.search = `%${search}%`;
+      conditions.push(`
+        (
+          ITEM.ItemCode LIKE @search 
+          OR ITEM.Description LIKE @search 
+          OR ITEM.ItemType LIKE @search
+        )
+      `);
+
+      parameters.search = `%${search.trim()}%`;
     }
 
+    // Add filters before GROUP BY
     if (conditions.length > 0) {
-      baseQuery += ' AND ' + conditions.join(' AND ');
+      baseQuery += ` AND ${conditions.join(' AND ')}`;
     }
+
+    // Group after all WHERE conditions
+    baseQuery += `
+      GROUP BY 
+        ITEM.ItemCode, 
+        ITEM.Description, 
+        ITEM.ItemBrand, 
+        ITEM.ItemClass, 
+        ITEM.ItemCategory,
+        UOM.UOM,
+        UOM.Price,
+        UOM.Weight
+    `;
 
     const request = pool.request();
+
     for (const [key, value] of Object.entries(parameters)) {
       request.input(key, value);
     }
 
     const result = await request.query(baseQuery);
-    res.json(result.recordset);
+
+    const items = result.recordset.map(({ Qty, ...item }) => {
+      let CartQty = 0;
+
+      if (Qty <= 0) {
+        QtyStatus = 'Unavailable';
+      } else if (Qty <= 8) {
+        QtyStatus = 'Limited';
+      } else {
+        QtyStatus = 'In Stock';
+      }
+
+      return {
+        ...item,
+        CartQty,
+        QtyStatus
+      };
+    });
+
+    res.json(items);
   } catch (err) {
     console.error('Error fetching filtered items:', err);
     res.status(500).send('Server error');

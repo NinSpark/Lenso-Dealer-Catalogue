@@ -10,7 +10,7 @@ import { AuthService } from './../services/auth.services';
   styleUrl: './app.css'
 })
 export class App {
-  protected title = 'Lenso Malaysia Stock List';
+  protected title = 'Lenso Malaysia Dealer Catalogue';
 
   constructor(private auth: AuthService, private router: Router) { }
 

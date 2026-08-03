@@ -17,14 +17,14 @@
             <mat-label>Search Wheel Keyword</mat-label>
             <input matInput placeholder="e.g. V1N" [(ngModel)]="searchRimText" (ngModelChange)="onSearchChange($event)"
                 [ngModelOptions]="{updateOn: 'change'}" #searchbar>
-            <button *ngIf="searchRimText" matSuffix mat-icon-button aria-label="Clear"
-                (click)="searchRimText = ''; applyFilter()">
+            <button *ngIf="searchRimText" matSuffix mat-icon-button (click)="searchRimText = ''; applyFilter()">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
 
-        <button mat-icon-button [disabled]="selectedItems.length == 0 || isLoading">
-            <mat-icon [matBadge]="selectedItems.length" [matBadgeHidden]="selectedItems.length == 0">send</mat-icon>
+        <button mat-icon-button class="more-option-button" (click)="openCartDialog()"
+            [disabled]="selectedItems.length == 0 || isLoading">
+            <mat-icon [matBadge]="selectedItems.length">trolley</mat-icon>
         </button>
         <button mat-icon-button [matMenuTriggerFor]="sortMenu" class="more-option-button" [disabled]="isLoading">
             <mat-icon>swap_vert</mat-icon>
@@ -82,27 +82,6 @@
             <button *ngIf="fullItemList.data.length > 0" mat-menu-item (click)="clearList()" [disabled]="isLoading">
                 <mat-icon>refresh</mat-icon>
                 <span>Reset List</span>
-            </button>
-            <button mat-menu-item (click)="shareSelectedImages()"
-                [disabled]="selectedItems.length == 0 || isLoading || (!isMobileView && !isTabletView)">
-                <mat-icon>share</mat-icon>
-                <span>Share Image</span>
-            </button>
-            <button mat-menu-item (click)="exportToPDF()" [disabled]="selectedItems.length == 0 || isLoading">
-                <img src="assets/export.svg" style="width: 24px; height: 24px; margin-right: 16px" />
-                <span>Share PDF</span>
-            </button>
-            <button mat-menu-item (click)="selectAll()" [disabled]="isLoading">
-                <ng-container>
-                    @if (selectedItems.length == 0) {
-                    <mat-icon>playlist_add_check</mat-icon>
-                    <span>Select All</span>
-                    }
-                    @else if (selectedItems.length > 0) {
-                    <mat-icon>playlist_remove</mat-icon>
-                    <span>Deselect All</span>
-                    }
-                </ng-container>
             </button>
             <button mat-menu-item (click)="logout()">
                 <mat-icon>logout</mat-icon>
@@ -170,7 +149,8 @@
     </mat-accordion>
 
     <ng-container *ngIf="!isMobileView && !isTabletView">
-        <div class="item-shown-message" style="margin-top: 12px;" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" style="margin-top: 12px;" *ngIf="showOOS">Showing {{fullItemList.data.length}}
+            result(s).</div>
         <div class="item-shown-message" *ngIf="!showOOS" style="margin-top: 12px;">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
         <mat-divider class="eof-divider"></mat-divider>
@@ -178,23 +158,22 @@
         <div class="desktop-card-div">
             <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
                 <div *ngIf="showOOS || item.StockQty > 0" [@cardAnim]>
-                    <mat-card [id]="item.ItemCode" (click)="toggleCard(item)"
-                        [style.cursor]="item.imageExist ? 'pointer':'default'"
-                        [ngClass]="{'selected-card': isSelected(item)}">
-                        <div class="card-header-checkbox" [ngClass]="{'highlight-header': isSelected(item)}">
-                            <mat-checkbox class="toggle-card-checkbox" [checked]="isSelected(item)"
-                                [style.pointer-events]="item.imageExist ? 'auto':'none'"></mat-checkbox>
-                            <mat-icon class="placeholder-check" fontIcon="check"
-                                [style.display]="isSelected(item) ? 'none' : 'inline-block'"></mat-icon>
-                        </div>
+                    <mat-card [id]="item.ItemCode" (click)="toggleCard(item)">
                         <div class="text-align-center">
                             <div class="image-container">
+                                <div class="stock-status-div">
+                                    <span class="stock-status-msg" [ngClass]="{
+                                        'stock-out': item.QtyStatus === 'Unavailable',
+                                        'stock-limited': item.QtyStatus === 'Limited',
+                                        'stock-available': item.QtyStatus === 'In Stock'
+                                        }">{{ item.QtyStatus }}
+                                    </span>
+                                </div>
                                 <div *ngIf="!item.imageLoaded" class="wheel-image-loading d-flex">
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
 
-                                <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
-                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                <img class="wheel-image" [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
                                     (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
                             </div>
 
@@ -223,14 +202,28 @@
                                 </div>
                                 <div class="qty-section">
                                     <div class="current-qty">
-                                        <div
-                                            style="display: flex; justify-content: space-evenly; align-items: center; width: 100%;">
-                                            <!-- <button matButton="tonal">Add to Cart</button> -->
+                                        @if (item.CartQty > 0) {
+                                        <div class="quantity-options">
+                                            @if (item.CartQty == 1) {
+                                            <button matIconButton (click)="changeItemCartQty(item, false)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                            } @else {
+                                            <button matIconButton (click)="changeItemCartQty(item, false)">
+                                                <mat-icon>remove</mat-icon>
+                                            </button>
+                                            }
+                                            <div>{{item.CartQty}}</div>
+                                            <button matIconButton (click)="changeItemCartQty(item, true)">
+                                                <mat-icon>add</mat-icon>
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div class="current-price">
-
-                                        <div>{{item.QtyStatus}}</div>
+                                        } @else {
+                                        <button class="add-to-cart-btn" matButton="tonal" color="primary"
+                                            (click)="addToCart(item)" [disabled]="item.QtyStatus === 'Unavailable'">Add
+                                            to
+                                            Cart</button>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -243,72 +236,96 @@
 
     <!-- Mobile: 1 card per row -->
     <ng-container *ngIf="isMobileView">
-        <div class="item-shown-message" *ngIf="showOOS" style="margin-top: 12px;">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" *ngIf="showOOS" style="margin-top: 12px;">Showing {{fullItemList.data.length}}
+            result(s).</div>
         <div class="item-shown-message" *ngIf="!showOOS" style="margin-top: 12px;">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
         <mat-divider class="eof-divider"></mat-divider>
 
-        <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
-            <div *ngIf="showOOS || item.StockQty > 0" [@cardAnim]>
-                <mat-card [id]="item.ItemCode" (click)="toggleCard(item)"
-                    [style.cursor]="item.imageExist ? 'pointer':'default'"
-                    [ngClass]="{'selected-card': isSelected(item)}">
-                    <div class="card-header-checkbox" [ngClass]="{'highlight-header': isSelected(item)}">
-                        <mat-checkbox class="toggle-card-checkbox" [checked]="isSelected(item)"
-                            [style.pointer-events]="item.imageExist ? 'auto':'none'"></mat-checkbox>
-                        <mat-icon class="placeholder-check" fontIcon="check"
-                            [style.display]="isSelected(item) ? 'none' : 'inline-block'"></mat-icon>
-                    </div>
-                    <div class="text-align-center">
-                        <div class="image-container">
-                            <div *ngIf="!item.imageLoaded" class="wheel-image-loading d-flex">
-                                <mat-spinner diameter="70"></mat-spinner>
+        <div class="mobile-card-list">
+            <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
+                <div *ngIf="showOOS || item.StockQty > 0" [@cardAnim]>
+                    <mat-card [id]="item.ItemCode" (click)="toggleCard(item)">
+                        <div class="text-align-center">
+                            <div class="image-container">
+                                <div class="stock-status-div">
+                                    <span class="stock-status-msg" [ngClass]="{
+                                        'stock-out': item.QtyStatus === 'Unavailable',
+                                        'stock-limited': item.QtyStatus === 'Limited',
+                                        'stock-available': item.QtyStatus === 'In Stock'
+                                        }">{{ item.QtyStatus }}
+                                    </span>
+                                </div>
+                                <div *ngIf="!item.imageLoaded" class="wheel-image-loading d-flex">
+                                    <mat-spinner diameter="70"></mat-spinner>
+                                </div>
+
+                                <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
+                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
                             </div>
 
-                            <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
-                                [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                            <p class="item-description"><b>{{ item.Description }}</b></p>
+                            <p class="code-name">{{ item.ItemCode }}</p>
                         </div>
 
-                        <p class="item-description"><b>{{ item.Description }}</b></p>
-                        <p class="code-name">{{ item.ItemCode }}</p>
-                    </div>
-
-                    <mat-card-content>
-                        <div class="mobile-info-qty">
-                            <div class="info-details">
-                                <div class="type-info">
-                                    <mat-icon fontIcon="hardware"></mat-icon>
-                                    <div>{{ item.ItemClass | titlecase }}</div>
+                        <mat-card-content>
+                            <div class="mobile-info-qty">
+                                <div class="info-details">
+                                    <div class="type-info">
+                                        <mat-icon fontIcon="hardware"></mat-icon>
+                                        <div>{{ item.ItemClass | titlecase }}</div>
+                                    </div>
+                                    <!-- <div class="pcd-info">
+                                        <img src="assets/PCD-01-02-01.svg"
+                                            style="width: 24px; height: 24px; margin: 0" />
+                                        <div>{{ item.ItemCategory }}</div>
+                                    </div> -->
+                                    <div class="weight-info">
+                                        <img src="assets/weight_filled.svg"
+                                            style="width: 24px; height: 24px; margin: 0" />
+                                        <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
+                                        <div *ngIf="item.Weight == -1">N/A</div>
+                                    </div>
                                 </div>
-                                <div class="pcd-info">
-                                    <img src="assets/PCD-01-02-01.svg" style="width: 24px; height: 24px; margin: 0" />
-                                    <div>{{ item.ItemCategory }}</div>
-                                </div>
-                                <div class="weight-info">
-                                    <img src="assets/weight_filled.svg" style="width: 24px; height: 24px; margin: 0" />
-                                    <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
-                                    <div *ngIf="item.Weight == -1">N/A</div>
+                                <div class="qty-section">
+                                    <div class="current-qty">
+                                        @if (item.CartQty > 0) {
+                                        <div class="quantity-options">
+                                            @if (item.CartQty == 1) {
+                                            <button matIconButton (click)="changeItemCartQty(item, false)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                            } @else {
+                                            <button matIconButton (click)="changeItemCartQty(item, false)">
+                                                <mat-icon>remove</mat-icon>
+                                            </button>
+                                            }
+                                            <div>{{item.CartQty}}</div>
+                                            <button matIconButton (click)="changeItemCartQty(item, true)">
+                                                <mat-icon>add</mat-icon>
+                                            </button>
+                                        </div>
+                                        } @else {
+                                        <button class="add-to-cart-btn" matButton="tonal" color="primary"
+                                            (click)="addToCart(item)" [disabled]="item.QtyStatus === 'Unavailable'">Add
+                                            to
+                                            Cart</button>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                            <div class="qty-section">
-                                <div class="current-qty">
-                                    <!-- <button matButton="tonal">Add to Cart</button> -->
-                                </div>
-                                <div class="current-price">
-                                    <div>Water</div>
-                                </div>
-                            </div>
-                        </div>
-                    </mat-card-content>
-                </mat-card>
-            </div>
-        </ng-container>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </ng-container>
+        </div>
     </ng-container>
 
     <!-- Tablet: 2 cards per row -->
     <ng-container *ngIf="isTabletView">
-        <div class="item-shown-message" style="margin-top: 12px;" *ngIf="showOOS">Showing {{fullItemList.data.length}} result(s).</div>
+        <div class="item-shown-message" style="margin-top: 12px;" *ngIf="showOOS">Showing {{fullItemList.data.length}}
+            result(s).</div>
         <div class="item-shown-message" style="margin-top: 12px;" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
         <mat-divider class="eof-divider"></mat-divider>
@@ -316,17 +333,18 @@
         <div class="tablet-card-div">
             <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
                 <div *ngIf="showOOS || item.StockQty > 0" [@cardAnim]>
-                    <mat-card [id]="item.ItemCode" (click)="toggleCard(item)"
-                        [style.cursor]="item.imageExist ? 'pointer':'default'"
+                    <mat-card [id]="item.ItemCode" [style.cursor]="item.imageExist ? 'pointer':'default'"
                         [ngClass]="{'selected-card': isSelected(item)}">
-                        <div class="card-header-checkbox" [ngClass]="{'highlight-header': isSelected(item)}">
-                            <mat-checkbox class="toggle-card-checkbox" [checked]="isSelected(item)"
-                                [style.pointer-events]="item.imageExist ? 'auto':'none'"></mat-checkbox>
-                            <mat-icon class="placeholder-check" fontIcon="check"
-                                [style.display]="isSelected(item) ? 'none' : 'inline-block'"></mat-icon>
-                        </div>
                         <div class="text-align-center">
                             <div class="image-container">
+                                <div class="stock-status-div">
+                                    <span class="stock-status-msg" [ngClass]="{
+                                        'stock-out': item.QtyStatus === 'Unavailable',
+                                        'stock-limited': item.QtyStatus === 'Limited',
+                                        'stock-available': item.QtyStatus === 'In Stock'
+                                        }">{{ item.QtyStatus }}
+                                    </span>
+                                </div>
                                 <div *ngIf="!item.imageLoaded" class="wheel-image-loading d-flex">
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
@@ -361,10 +379,28 @@
                                 </div>
                                 <div class="qty-section">
                                     <div class="current-qty">
-                                        <!-- <button matButton="tonal">Add to Cart</button> -->
-                                    </div>
-                                    <div class="current-price">
-                                        <div>Water</div>
+                                        @if (item.CartQty > 0) {
+                                        <div class="quantity-options">
+                                            @if (item.CartQty == 1) {
+                                            <button matIconButton (click)="changeItemCartQty(item, false)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                            } @else {
+                                            <button matIconButton (click)="changeItemCartQty(item, false)">
+                                                <mat-icon>remove</mat-icon>
+                                            </button>
+                                            }
+                                            <div>{{item.CartQty}}</div>
+                                            <button matIconButton (click)="changeItemCartQty(item, true)">
+                                                <mat-icon>add</mat-icon>
+                                            </button>
+                                        </div>
+                                        } @else {
+                                        <button class="add-to-cart-btn" matButton="tonal" color="primary"
+                                            (click)="addToCart(item)" [disabled]="item.QtyStatus === 'Unavailable'">Add
+                                            to
+                                            Cart</button>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -375,33 +411,38 @@
         </div>
     </ng-container>
 
-    <div *ngIf="(isLoading || !isStockCountReady) && !isInitial"
-        class="loading-container no-entries-message d-flex text-align-center">
+    <div class="footer-div">
+        <div *ngIf="(isLoading || !isStockCountReady) && !isInitial"
+            class="loading-container no-entries-message d-flex text-align-center">
+            <div>
+                <mat-spinner diameter="70"></mat-spinner>
+                <div style="margin-top: 20px;">Querying Lenso database...</div>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading && !showOOS && (emptyStockCount > 0) && fullStockCount == 0 && isStockCountReady"
+            class="loading-container no-entries-message d-flex text-align-center">
+            <div class="opaque-msg">
+                <img src="assets/inventory.png" class="msg-icon">
+                <div>Only Out of Stock item(s) result found</div>
+            </div>
+        </div>
+
+        <div *ngIf="fullItemList.data.length === 0 && !isLoading" class="d-flex text-align-center no-entries-message">
+            <div *ngIf="searchRimText.trim() != '' && !isInitial" class="opaque-msg">
+                <img src="assets/box.png" class="msg-icon">
+                <div>No matching results. Try different search or filters.</div>
+            </div>
+            <div *ngIf="searchRimText.trim() == '' && isInitial" class="opaque-msg">
+                <img src="assets/magnifier.png" class="msg-icon">
+                <div>Find wheels by search or filter.</div>
+            </div>
+        </div>
+
         <div>
-            <mat-spinner diameter="70"></mat-spinner>
-            <div style="margin-top: 20px;">Querying Lenso database...</div>
+            <div class="eof text-align-center">E.O.F.</div>
+            <mat-divider class="eof-divider"></mat-divider>
         </div>
-    </div>
 
-    <div *ngIf="!isLoading && !showOOS && (emptyStockCount > 0) && fullStockCount == 0 && isStockCountReady"
-        class="loading-container no-entries-message d-flex text-align-center">
-        <div class="opaque-msg">
-            <img src="assets/inventory.png" class="msg-icon">
-            <div>Only Out of Stock item(s) result found</div>
-        </div>
     </div>
-
-    <div *ngIf="fullItemList.data.length === 0 && !isLoading" class="d-flex text-align-center no-entries-message">
-        <div *ngIf="searchRimText.trim() != '' && !isInitial" class="opaque-msg">
-            <img src="assets/box.png" class="msg-icon">
-            <div>No matching results. Try different search or filters.</div>
-        </div>
-        <div *ngIf="searchRimText.trim() == '' && isInitial" class="opaque-msg">
-            <img src="assets/magnifier.png" class="msg-icon">
-            <div>Find wheels by search or filter.</div>
-        </div>
-    </div>
-
-    <div class="eof text-align-center">E.O.F.</div>
-    <mat-divider class="eof-divider"></mat-divider>
 </div>

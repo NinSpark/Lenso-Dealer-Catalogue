@@ -1,0 +1,48 @@
+<div class="dialog-header header-title">
+    <h2 mat-dialog-title><b>Cart Overview</b></h2>
+    <button matIconButton (click)="closeDialog()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-dialog-content class="dialog-content">
+    <div class="cart-list-div">
+        <mat-card *ngFor="let item of cartItemList" appearance="outlined">
+            @if (item.CartQty >= 1) {
+            <div class="card-header">
+                <img class="wheel-image" [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                <div class="card-content">
+                    <div class="card-description">
+                        <mat-card-title>{{item.Description}}</mat-card-title>
+                        <div class="item-class-weight">
+                            Type: <b>{{item.ItemClass | titlecase}}</b>, Weight: <b *ngIf="item.Weight > 0">{{
+                                item.Weight | number:'1.2-2' }} kg</b><b *ngIf="item.Weight <= 0">N/A</b>
+                        </div>
+                    </div>
+                    <div class="quantity-options">
+                        @if (item.CartQty <= 1) { <button matIconButton (click)="changeItemCartQty(item, false)">
+                            <mat-icon>delete</mat-icon>
+                            </button>
+                            } @else {
+                            <button matIconButton (click)="changeItemCartQty(item, false)">
+                                <mat-icon>remove</mat-icon>
+                            </button>
+                            }
+                            <div>{{item.CartQty}}</div>
+                            <button matIconButton (click)="changeItemCartQty(item, true)">
+                                <mat-icon>add</mat-icon>
+                            </button>
+                    </div>
+                </div>
+            </div>
+            } @else {
+            <div class="removed-item-card">"<b>{{item.Description}}</b>" was removed from Shopping Cart.</div>
+            }
+        </mat-card>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button class="contact-button" matButton="filled" (click)="whatsAppContact()">WhatsApp Sales Agent</button>
+</mat-dialog-actions>

@@ -19,12 +19,12 @@ img.fallback {
   -webkit-touch-callout: none;
 }
 
-.main-table-div {
-  overflow: auto;
+img {
+  border-radius: 8px 8px 0 0;
 }
 
-.body {
-  padding: 10px;
+.main-table-div {
+  overflow: auto;
 }
 
 #share-msg {
@@ -122,27 +122,10 @@ mat-expansion-panel {
   gap: 10px;
 }
 
-.current-qty,
-.current-price {
-  width: 100%;
-  height: 60px;
-  text-align: center;
-  border-radius: 12px;
-  border: 1px solid black;
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: #171c22;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 0 4px 0;
-}
-
 mat-card {
-  padding-bottom: 10px;
   border: 2px solid #797979;
   border-radius: 10px !important;
+  height: 100%;
 
   img {
     width: 100%;
@@ -174,12 +157,6 @@ mat-card {
   margin: 0;
 }
 
-.item-description {
-  margin: 0;
-  font-size: 14px;
-  padding: 8px 20px 0 20px;
-}
-
 .price-section {
   margin-top: 12px;
   display: flex;
@@ -191,13 +168,6 @@ mat-card {
 .set-div {
   font-size: 10px;
   color: #797979;
-}
-
-.info-details {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  margin: 16px 0;
 }
 
 .type-info,
@@ -272,8 +242,63 @@ mat-card {
   gap: 10px;
 }
 
+.add-to-cart-btn {
+  height: 100%;
+  letter-spacing: normal;
+}
+
 /* mobile css */
 @media only screen and (max-width: 600px) {
+  .body {
+    padding: 4px;
+    height: calc(100vh - 8px)
+  }
+
+  .mobile-card-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+
+  mat-card {
+    width: 48vw;
+    margin: 4px 0;
+    padding-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+
+    mat-card-content {
+      margin-top: 0 !important;
+      padding-bottom: 0;
+    }
+  }
+
+  .item-description {
+    margin: 0;
+    font-size: 12px;
+    padding: 8px 12px 0 12px;
+    line-height: 1.4;
+  }
+
+  .info-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin: 8px 0;
+    align-items: start;
+    gap: 4px;
+
+    .mat-icon {
+      height: 16px !important;
+      width: 16px !important;
+      font-size: 16px !important;
+    }
+
+    img {
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
 
   .wheel-image-loading {
     width: 100%;
@@ -287,10 +312,6 @@ mat-card {
     width: 100%;
   }
 
-  mat-card {
-    margin: 4px 0 16px 0;
-  }
-
   .no-entries-message {
     height: 55vh;
   }
@@ -298,6 +319,46 @@ mat-card {
   .filter-select-form {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
+  }
+
+  .add-to-cart-btn {
+    width: 80%;
+    font-size: 1rem;
+    border-radius: 12px;
+    padding: 8px 0;
+  }
+
+  .current-qty {
+    width: 100%;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0 4px 0;
+  }
+
+  .quantity-options button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+  }
+
+  .quantity-options mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .stock-status-msg {
+    font-size: 0.6rem;
+    padding: 4px 8px;
+  }
+
+  .stock-status-div {
+    bottom: 7%;
     width: 100%;
   }
 }
@@ -308,11 +369,25 @@ mat-card {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+    padding: 0 4px;
+  }
+
+  .add-to-cart-btn {
+    width: 154px;
+    font-size: 1.2rem;
+    border-radius: 12px;
   }
 
   .wheel-image-loading {
     width: 100%;
     height: 260px;
+  }
+
+  .info-details {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 16px 0;
   }
 
   .filter-select-options {
@@ -339,10 +414,53 @@ mat-card {
     justify-content: center;
     align-items: center;
   }
+
+  .current-qty,
+  .current-price {
+    width: 100%;
+    height: 60px;
+    text-align: center;
+    border-radius: 12px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #171c22;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0 4px 0;
+  }
+
+  .stock-status-div {
+    bottom: 5%;
+    width: 100%;
+  }
+
+  .stock-status-msg {
+    font-size: 1rem;
+    padding: 4px 8px;
+  }
 }
 
 /* desktop css */
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1024.1px) {
+  .body {
+    padding: 10px;
+    height: calc(100vh - 20px);
+  }
+
+  .item-description {
+    margin: 0;
+    font-size: 14px;
+    padding: 8px 20px 0 20px;
+  }
+
+  .info-details {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 16px 0;
+  }
 
   .wheel-image-loading {
     width: 100%;
@@ -363,7 +481,6 @@ mat-card {
 
   mat-card {
     margin: 0;
-    max-width: 470px;
   }
 
   .no-entries-message {
@@ -374,4 +491,82 @@ mat-card {
     justify-content: center;
     align-items: center;
   }
+
+  .add-to-cart-btn {
+    width: 154px;
+    font-size: 1.2rem;
+    border-radius: 12px;
+  }
+
+  .current-qty,
+  .current-price {
+    width: 100%;
+    height: 60px;
+    text-align: center;
+    border-radius: 12px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #171c22;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0 4px 0;
+  }
+
+  .stock-status-div {
+    bottom: 4%;
+    width: 16%;
+  }
+
+  .stock-status-msg {
+    font-size: 0.8rem;
+    padding: 1px 8px;
+  }
+}
+
+mat-card-content {
+  margin-top: auto;
+}
+
+.image-container {
+  position: relative;
+}
+
+.stock-status-div {
+  position: absolute;
+  right: 2%;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+
+  .stock-out {
+    background-color: rgba(255, 0, 0, 0.5);
+  }
+
+  .stock-limited {
+    background-color: rgba(255, 166, 0, 0.5);
+  }
+
+  .stock-available {
+    background-color: rgba(0, 128, 0, 0.5);
+  }
+}
+
+.stock-status-msg {
+  font-weight: bold;
+  color: white;
+  border-radius: 4px;
+}
+
+.quantity-options {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 16px;
+  font-weight: bold;
+  width: fit-content;
+  border: 2px solid gray;
+  padding: 4px;
+  border-radius: 50px;
 }

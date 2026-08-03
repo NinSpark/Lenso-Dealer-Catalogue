@@ -127,3 +127,8 @@ mat-card .mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__back
 .mat-badge-content {
     background-color: #a01b1f !important;
 }
+
+.mat-tonal-button:not(:disabled) {
+    background-color: #a01b1f !important;
+    color: white !important;
+}

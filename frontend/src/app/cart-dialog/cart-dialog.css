@@ -1,0 +1,145 @@
+.wheel-image {
+    object-fit: contain;
+    height: 144px;
+}
+
+.cart-list-div {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.header-title {
+    margin: 0 !important;
+    padding: 8px 20px;
+    background-color: #a01b1f;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+        margin: 0;
+    }
+}
+
+.quantity-options {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 16px;
+    font-weight: bold;
+    width: fit-content;
+    border: 2px solid gray;
+    padding: 4px;
+    border-radius: 50px;
+}
+
+.quantity-options button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+}
+
+.quantity-options mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.contact-button {
+    width: 100%;
+    background-color: #25D366 !important;
+    color: white;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.removed-item-card {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    padding: 20px 8px;
+}
+
+mat-dialog-actions {
+    border-top: 1px solid #ccc;
+}
+
+::ng-deep.mat-mdc-dialog-surface {
+    height: fit-content !important;
+}
+
+.item-class-weight {
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+/* mobile */
+@media only screen and (max-width: 600px) {
+
+    .wheel-image {
+        width: 100%;
+        height: fit-content;
+    }
+
+    .card-header {
+        justify-content: start;
+        gap: 20px;
+    }
+
+    mat-card {
+        padding: 8px;
+    }
+
+    mat-card-title,
+    mat-card-subtitle,
+    .item-class-weight {
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    mat-card-title {
+        font-size: 16px;
+    }
+
+    .item-class-weight {
+        margin-top: 8px;
+    }
+
+    .card-content {
+        align-items: center;
+    }
+
+    .quantity-options {
+        margin-top: 12px;
+    }
+}
+
+/* tablet */
+@media only screen and (min-width: 601px) and (max-width: 1025px) {
+
+    .card-header {
+        justify-content: start;
+        gap: 20px;
+    }
+}
+
+/* desktop */
+@media only screen and (min-width: 1024px) {
+
+    .card-header {
+        display: flex;
+        justify-content: start;
+        gap: 20px;
+    }
+
+    mat-card {
+        padding: 8px 100px 8px 8px;
+    }
+}

@@ -16,12 +16,24 @@ export class StockService {
     private stockApiUrl = `${this.domain}/api/stock`;
     private weightApiUrl = `${this.domain}/api/item-weight`;
     private getSecuredLoginUrl = `${this.domain}/secured-sales-login`;
+    private getDealerSecuredLoginUrl = `${this.domain}/secured-dealer-login`;
+    private updateShoppingCartUrl = `${this.domain}/api/update-shopping-cart`;
 
     constructor(private http: HttpClient) { }
 
     getSecuredLoginDetails(username: string, password: string) {
         const body = { username, password };
         return this.http.post<any>(this.getSecuredLoginUrl, body);
+    }
+
+    getDealerSecuredLoginDetails(username: string, password: string) {
+        const body = { username, password };
+        return this.http.post<any>(this.getDealerSecuredLoginUrl, body);
+    }
+
+    updateShoppingCart(id: number, shopping_cart: any) {
+        const body = { shopping_cart };
+        return this.http.put<any>(`${this.updateShoppingCartUrl}/${id}`, body);
     }
 
     getItemList(isLensoDB?: boolean): Observable<any[]> {

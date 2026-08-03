@@ -11,9 +11,11 @@ import jsPDF from 'jspdf';
 import { MaterialModule } from '../shared/material.module';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.services';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { CartDialog } from '../cart-dialog/cart-dialog';
 
 @Component({
   selector: 'app-home',
@@ -50,6 +52,8 @@ export class Home implements OnInit {
   private searchSubject = new Subject<string>();
   private searchSub: any;
   shareMsg: string = '';
+
+  private saveCartSubject = new Subject<void>();
 
   fullItemList = new MatTableDataSource<LensoItem>();
   isSet: boolean = true;
@@ -98,7 +102,8 @@ export class Home implements OnInit {
     private router: Router,
     private cd: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object,
-    { nativeElement }: ElementRef<HTMLImageElement>
+    { nativeElement }: ElementRef<HTMLImageElement>,
+    private dialog: MatDialog
   ) {
     const supports = 'loading' in HTMLImageElement.prototype;
 
@@ -115,6 +120,9 @@ export class Home implements OnInit {
 
     this.shareMsg = "Initializing Database...";
     this.isLoadingShare = true;
+
+    const savedCartData = this.authService.getShoppingCart();
+    savedCartData ? this.selectedItems = JSON.parse(savedCartData) : this.selectedItems = [];
 
     if (isPlatformBrowser(this.platformId)) {
       this.checkScreen();
@@ -137,6 +145,26 @@ export class Home implements OnInit {
       .subscribe((searchValue) => {
         this.applyFilter();
       });
+
+    this.saveCartSubject.pipe(
+      debounceTime(800),
+      switchMap(() => {
+        const loginId = this.authService.getloggedInID();
+        localStorage.setItem('shopping_cart', JSON.stringify(this.selectedItems));
+
+        return this.stockService.updateShoppingCart(
+          Number(loginId),
+          JSON.stringify(this.selectedItems)
+        );
+      })
+    ).subscribe({
+      next: (response) => {
+        console.log('Shopping cart updated successfully:', response);
+      },
+      error: (error) => {
+        console.error('Failed to update shopping cart:', error);
+      }
+    });
   }
 
   @HostListener('window:scroll', [])
@@ -152,6 +180,7 @@ export class Home implements OnInit {
   }
 
   logout() {
+    localStorage.removeItem('shopping_cart');
     this.authService.logout();
     this.router.navigate(['/login']);
   }
@@ -241,7 +270,8 @@ export class Home implements OnInit {
   }
 
   resetFilters(): void {
-    this.selectedItems = [];
+    // this.selectedItems = [];
+    // localStorage.removeItem('cart');
     this.selectedType = 'all-type';
     this.selectedSize.setValue(['all-size', ...this.sizeList.map(size => size.value)]);
     this.selectedPCD.setValue(['all-pcd', ...this.pcdList.map(pcd => pcd.value)]);
@@ -256,7 +286,8 @@ export class Home implements OnInit {
 
   clearList(): void {
     this.isInitial = true;
-    this.selectedItems = [];
+    // this.selectedItems = [];
+    // localStorage.removeItem('cart');
     this.selectedType = 'all-type';
     this.selectedSize.setValue(['all-size', ...this.sizeList.map(size => size.value)]);
     this.selectedPCD.setValue(['all-pcd', ...this.pcdList.map(pcd => pcd.value)]);
@@ -270,12 +301,17 @@ export class Home implements OnInit {
   }
 
   toggleCard(item: LensoItem) {
-    const index = this.selectedItems.indexOf(item);
-    if (index >= 0) {
-      this.selectedItems.splice(index, 1);
-    } else {
-      if (item.imageExist) this.selectedItems.push(item);
-    }
+    // const index = this.selectedItems.indexOf(item);
+    // if (index >= 0) {
+    //   this.selectedItems.splice(index, 1);
+    // } else {
+    //   if (item.imageExist) {
+    //     item.CartQty = 1;
+    //     item.RemovedFromCart = false;
+    //     this.selectedItems.push(item);
+    //     this.saveCart();
+    //   }
+    // }
   }
 
   isSelected(item: LensoItem): boolean {
@@ -411,7 +447,6 @@ export class Home implements OnInit {
     let selectedType: string = this.selectedType;
     let search: string = this.searchRimText.trim() || '';
 
-    this.selectedItems = [];
     const pcdIndex = selectedPCDs.indexOf("all-pcd");
     const sizeIndex = selectedSizes.indexOf("all-size");
 
@@ -427,8 +462,26 @@ export class Home implements OnInit {
       .subscribe({
         next: (data: LensoItem[]) => {
           this.fullItemList.data = data;
-          this.fetchPriceAndWeight();
+          // this.fetchPriceAndWeight();
           // console.log(this.fullItemList.data);
+
+          this.applySort();
+          this.fullStockCount = this.inStockCount();
+          this.emptyStockCount = this.fullItemList.data.length - this.fullStockCount;
+          this.isStockCountReady = true;
+
+          if (this.selectedItems.length > 0) {
+            const itemMap = new Map(
+              this.fullItemList.data.map(item => [item.ItemCode, item])
+            );
+
+            this.selectedItems.forEach(selectedItem => {
+              const found = itemMap.get(selectedItem.ItemCode);
+              if (found) {
+                found.CartQty = selectedItem.CartQty;
+              }
+            });
+          }
         },
         error: (error) => {
           console.error('Error during filtering:', error);
@@ -454,6 +507,8 @@ export class Home implements OnInit {
     itemsToSelect.forEach((item: LensoItem) => {
       this.selectedItems.push(item);
     });
+
+    this.saveCart();
   }
 
   async shareSelectedImages() {
@@ -638,5 +693,57 @@ export class Home implements OnInit {
     (el.style as any).webkitUserSelect = 'none';
     (el.style as any).msUserSelect = 'none';
     (el.style as any).MozUserSelect = 'none';
+  }
+
+  openCartDialog() {
+    const dialogRef = this.dialog.open(CartDialog, {
+      width: 'fit-content',
+      maxWidth: '95vw',
+      height: '80vh',
+      autoFocus: false,
+      data: {
+        salesAgent: this.authService.getSalesAgent(),
+        selectedItems: this.selectedItems
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((cartItemList: any) => {
+      this.selectedItems = this.selectedItems.filter(item => item.CartQty > 0);
+      this.saveCart();
+    });
+  }
+
+  addToCart(item: LensoItem) {
+    item.CartQty = 1;
+    this.selectedItems.push(item);
+    this.saveCart();
+  }
+
+  saveCart() {
+    this.saveCartSubject.next();
+  }
+
+  clearCart() {
+    this.selectedItems = [];
+    this.saveCart();
+  }
+
+  changeItemCartQty(item: LensoItem, isAdd: boolean) {
+    const index = this.selectedItems.findIndex(
+      selectedItem => selectedItem.ItemCode === item.ItemCode
+    );
+    
+    if (isAdd) {
+      item.CartQty++;
+    } else {
+      if (item.CartQty > 1) {
+        item.CartQty--;
+      } else {
+        item.CartQty = 0;
+      }
+    }
+
+    this.selectedItems[index] = item;
+    this.saveCart();
   }
 }
