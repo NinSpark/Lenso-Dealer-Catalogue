@@ -16,6 +16,7 @@ import { AuthService } from '../../services/auth.services';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CartDialog } from '../cart-dialog/cart-dialog';
+import { RegisterDealerDialog } from '../register-dealer-dialog/register-dealer-dialog';
 
 @Component({
   selector: 'app-home',
@@ -46,6 +47,7 @@ export class Home implements OnInit {
   fullStockCount: number = 0;
   emptyStockCount: number = 0;
   isInitial: boolean = true;
+  loggedInUser: string = '';
 
   @ViewChild('searchbar') searchbar!: ElementRef;
   searchRimText = '';
@@ -122,17 +124,18 @@ export class Home implements OnInit {
     this.isLoadingShare = true;
 
     const savedCartData = this.authService.getShoppingCart();
-    savedCartData ? this.selectedItems = JSON.parse(savedCartData) : this.selectedItems = [];
+    if (savedCartData == "null" || !savedCartData) {
+      this.selectedItems = []
+    } else {
+      this.selectedItems = JSON.parse(savedCartData);
+    }
 
     if (isPlatformBrowser(this.platformId)) {
       this.checkScreen();
       window.addEventListener('resize', this.checkScreen.bind(this));
     }
 
-    if (this.authService.getLoggedInUser() == "KSEM-ADMIN") {
-      this.showPrice = false;
-      this.hidePriceOption = true;
-    }
+    this.loggedInUser = this.authService.getLoggedInUser() || '';
 
     this.getPCDList();
     this.isLoadingShare = false;
@@ -159,7 +162,7 @@ export class Home implements OnInit {
       })
     ).subscribe({
       next: (response) => {
-        console.log('Shopping cart updated successfully:', response);
+        // console.log('Shopping cart updated successfully:', response);
       },
       error: (error) => {
         console.error('Failed to update shopping cart:', error);
@@ -732,18 +735,38 @@ export class Home implements OnInit {
     const index = this.selectedItems.findIndex(
       selectedItem => selectedItem.ItemCode === item.ItemCode
     );
-    
+
+    if (index == -1) return;
+
     if (isAdd) {
       item.CartQty++;
+      this.selectedItems[index] = item;
     } else {
       if (item.CartQty > 1) {
         item.CartQty--;
+        this.selectedItems[index] = item;
       } else {
         item.CartQty = 0;
+        this.selectedItems.splice(index, 1);
       }
     }
 
-    this.selectedItems[index] = item;
     this.saveCart();
+  }
+
+  registerDealer() {
+    const dialogRef = this.dialog.open(RegisterDealerDialog, {
+      width: '50vw',
+      maxWidth: '95vw',
+      height: '80vh',
+      autoFocus: false,
+      data: {
+
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+
+    });
   }
 }

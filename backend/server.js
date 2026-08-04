@@ -163,7 +163,7 @@ app.post("/secured-dealer-login", async (req, res) => {
 
   try {
     const result = await loginPool.query(
-      "SELECT * FROM dealer_login WHERE username = $1",
+      "SELECT * FROM dealer_login WHERE LOWER(username) = LOWER($1)",
       [username]
     );
 
@@ -175,11 +175,11 @@ app.post("/secured-dealer-login", async (req, res) => {
 
     const user = result.rows[0];
 
-    // const isMatch = await bcrypt.compare(
-    //   password,
-    //   user.password_hash
-    // );
-    const isMatch = password === user.password_hash;
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
+    // const isMatch = password === user.password_hash;
 
     if (!isMatch) {
       return res.status(401).json({
@@ -465,6 +465,71 @@ app.get('/api/filtered-item', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Error fetching filtered items:', err);
     res.status(500).send('Server error');
+  }
+});
+
+app.post("/create-dealer", authenticateToken, async (req, res) => {
+  const { dealer_code, company_name, username, email, phone, is_active, password, sales_agent } = req.body;
+
+  try {
+    const hash = await bcrypt.hash(password, 10);
+
+    await loginPool.query(
+      "INSERT INTO dealer_login (dealer_code, company_name, username, email, phone, is_active, password_hash, sales_agent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+      [dealer_code, company_name, username, email, phone, is_active, hash, sales_agent]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post('/change-password', authenticateToken, async (req, res) => {
+  const { username, newPassword } = req.body;
+
+  if (!username || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing username or new password"
+    });
+  }
+
+  try {
+    // 1. Check if user exists
+    const userCheck = await loginPool.query(
+      "SELECT * FROM dealer_login WHERE username = $1",
+      [username]
+    );
+
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // 2. Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // 3. Update password
+    await loginPool.query(
+      "UPDATE dealer_login SET password_hash = $1 WHERE username = $2",
+      [hashedPassword, username]
+    );
+
+    res.json({
+      success: true,
+      message: "Password updated successfully"
+    });
+
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 });
 

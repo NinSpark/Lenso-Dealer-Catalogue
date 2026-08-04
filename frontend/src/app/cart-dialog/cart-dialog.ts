@@ -46,7 +46,7 @@ export class CartDialog implements OnInit {
 
     const message = `Hi, I would like to order/enquire about the following items:\n\n${items}`;
 
-    console.log(message);
+    // console.log(message);
 
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
@@ -81,6 +81,11 @@ export class CartDialog implements OnInit {
     (el.style as any).webkitUserSelect = 'none';
     (el.style as any).msUserSelect = 'none';
     (el.style as any).MozUserSelect = 'none';
+  }
+
+  removeItem(item: LensoItem) {
+    item.CartQty = 0;
+    item.RemovedFromCart = true;
   }
 
   closeDialog() {

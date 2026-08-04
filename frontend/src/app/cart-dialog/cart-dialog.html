@@ -20,19 +20,25 @@
                                 item.Weight | number:'1.2-2' }} kg</b><b *ngIf="item.Weight <= 0">N/A</b>
                         </div>
                     </div>
-                    <div class="quantity-options">
-                        @if (item.CartQty <= 1) { <button matIconButton (click)="changeItemCartQty(item, false)">
-                            <mat-icon>delete</mat-icon>
-                            </button>
-                            } @else {
-                            <button matIconButton (click)="changeItemCartQty(item, false)">
-                                <mat-icon>remove</mat-icon>
-                            </button>
-                            }
-                            <div>{{item.CartQty}}</div>
-                            <button matIconButton (click)="changeItemCartQty(item, true)">
-                                <mat-icon>add</mat-icon>
-                            </button>
+                    <div class="card-quantity">
+                        <div class="quantity-options">
+                            @if (item.CartQty <= 1) { <button matIconButton (click)="changeItemCartQty(item, false)">
+                                <mat-icon>delete</mat-icon>
+                                </button>
+                                } @else {
+                                <button matIconButton (click)="changeItemCartQty(item, false)">
+                                    <mat-icon>remove</mat-icon>
+                                </button>
+                                }
+                                <div>{{item.CartQty}}</div>
+                                <button matIconButton (click)="changeItemCartQty(item, true)">
+                                    <mat-icon>add</mat-icon>
+                                </button>
+                        </div>
+
+                        <div>
+                            <a class="remove-item-text" (click)="removeItem(item)">Remove Item</a>
+                        </div>
                     </div>
                 </div>
             </div>

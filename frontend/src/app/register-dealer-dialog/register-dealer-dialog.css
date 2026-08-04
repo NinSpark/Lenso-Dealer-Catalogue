@@ -1,0 +1,56 @@
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+mat-dialog-content div {
+    margin-top: 8px;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+input {
+    width: 100%;
+    /* padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px; */
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+}
+
+.change-password-button {
+    width: 100%;
+}
+
+.change-password-div {
+    padding-top: 12px;
+    margin-top: 12px;
+    border-top: 1px solid #ccc;
+}
+
+@media (max-width: 400px) {
+    .login-container {
+        width: 90%;
+        padding: 15px;
+    }
+
+    input {
+        font-size: 14px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px;
+    }
+}

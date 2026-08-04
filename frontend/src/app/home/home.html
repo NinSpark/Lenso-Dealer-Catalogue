@@ -79,6 +79,10 @@
                 <mat-icon>visibility</mat-icon>
                 <span>Show All</span>
             </button>
+            <button *ngIf="loggedInUser === 'TEST'" mat-menu-item (click)="registerDealer()" [disabled]="isLoading">
+                <mat-icon>add_business</mat-icon>
+                <span>Register Dealer</span>
+            </button>
             <button *ngIf="fullItemList.data.length > 0" mat-menu-item (click)="clearList()" [disabled]="isLoading">
                 <mat-icon>refresh</mat-icon>
                 <span>Reset List</span>

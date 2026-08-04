@@ -18,8 +18,22 @@ export class StockService {
     private getSecuredLoginUrl = `${this.domain}/secured-sales-login`;
     private getDealerSecuredLoginUrl = `${this.domain}/secured-dealer-login`;
     private updateShoppingCartUrl = `${this.domain}/api/update-shopping-cart`;
+    private createUserUrl = `${this.domain}/create-dealer`;
+    private changePasswordUrl = `${this.domain}/change-password`;
 
     constructor(private http: HttpClient) { }
+
+    changePassword(username: string, newPassword: string): Observable<{ success: boolean; message?: string }> {
+        return this.http.post<{ success: boolean; message?: string }>(this.changePasswordUrl, {
+            username,
+            newPassword,
+        });
+    }
+
+    registerDealer(dealer_code: string, company_name: string, username: string, email: string, phone: string, is_active: boolean, password: string, sales_agent: string) {
+        const body = { dealer_code, company_name, username, email, phone, is_active, password, sales_agent };
+        return this.http.post<any>(this.createUserUrl, body);
+    }
 
     getSecuredLoginDetails(username: string, password: string) {
         const body = { username, password };

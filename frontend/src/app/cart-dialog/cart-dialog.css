@@ -119,6 +119,10 @@ mat-dialog-actions {
     .quantity-options {
         margin-top: 12px;
     }
+
+    .card-quantity {
+        text-align: center;
+    }
 }
 
 /* tablet */
@@ -127,6 +131,13 @@ mat-dialog-actions {
     .card-header {
         justify-content: start;
         gap: 20px;
+    }
+
+    .card-quantity {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 8px;
     }
 }
 
@@ -142,4 +153,18 @@ mat-dialog-actions {
     mat-card {
         padding: 8px 100px 8px 8px;
     }
+
+    .card-quantity {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+.remove-item-text {
+    font-size: 12px;
+    text-decoration: underline;
+    color: cadetblue;
+    cursor: pointer;
 }
