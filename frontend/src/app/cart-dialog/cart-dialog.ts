@@ -11,10 +11,6 @@ import { LensoItem } from '../models/lenso_item';
   styleUrl: './cart-dialog.css'
 })
 export class CartDialog implements OnInit {
-  // backendLink = "https://98j88mtl-3000.asse.devtunnels.ms";
-  // backendLink = "https://mcq5cp7n-3002.asse.devtunnels.ms";
-  backendLink = "http://localhost:3000";
-
   salesAgentInfoList: any[] = [
     { name: 'CHK', phone: '60123019232' },
     { name: 'LKY', phone: '60125206232' },
