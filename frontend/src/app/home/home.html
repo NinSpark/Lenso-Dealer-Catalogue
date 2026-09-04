@@ -157,7 +157,7 @@
             result(s).</div>
         <div class="item-shown-message" *ngIf="!showOOS" style="margin-top: 12px;">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
-        <mat-divider class="eof-divider"></mat-divider>
+        <mat-divider class="eof-divider upper-divider"></mat-divider>
 
         <div class="desktop-card-div">
             <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
@@ -223,7 +223,7 @@
                                             </button>
                                         </div>
                                         } @else {
-                                        <button class="add-to-cart-btn" matButton="tonal" color="primary"
+                                        <button class="add-to-cart-btn w-100" matButton="tonal" color="primary"
                                             (click)="addToCart(item)" [disabled]="item.QtyStatus === 'Unavailable'">Add
                                             to
                                             Cart</button>
@@ -244,7 +244,7 @@
             result(s).</div>
         <div class="item-shown-message" *ngIf="!showOOS" style="margin-top: 12px;">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
-        <mat-divider class="eof-divider"></mat-divider>
+        <mat-divider class="eof-divider upper-divider"></mat-divider>
 
         <div class="mobile-card-list">
             <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">
@@ -332,7 +332,7 @@
             result(s).</div>
         <div class="item-shown-message" style="margin-top: 12px;" *ngIf="!showOOS">Showing {{inStockCount()}} result(s).
             {{fullItemList.data.length - inStockCount()}} item(s) are unavailable.</div>
-        <mat-divider class="eof-divider"></mat-divider>
+        <mat-divider class="eof-divider upper-divider"></mat-divider>
 
         <div class="tablet-card-div">
             <ng-container *ngFor="let item of fullItemList.data; trackBy: trackByItemCode">

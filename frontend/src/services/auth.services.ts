@@ -15,10 +15,6 @@ export class AuthService {
 
   async login(username: string, password: string): Promise<boolean> {
     try {
-      // const res = await lastValueFrom(
-      //   this.api.getSecuredLoginDetails(username.toUpperCase(), password)
-      // );
-
       const res = await lastValueFrom(
         this.api.getDealerSecuredLoginDetails(username.toUpperCase(), password)
       );

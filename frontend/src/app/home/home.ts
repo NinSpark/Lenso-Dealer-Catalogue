@@ -2,11 +2,9 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild, PLATFORM_ID, Inject, E
 import { isPlatformBrowser } from '@angular/common';
 import { FormControl } from '@angular/forms';
 import { StockService } from '../../services/stock.service';
-import { LensoStock } from '../models/lenso_stock';
 import { LensoItem } from '../models/lenso_item';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { LensoWeight } from '../models/lenso_weight';
 import jsPDF from 'jspdf';
 import { MaterialModule } from '../shared/material.module';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -37,8 +35,8 @@ import { RegisterDealerDialog } from '../register-dealer-dialog/register-dealer-
 })
 export class Home implements OnInit {
   // backendLink = "https://98j88mtl-3000.asse.devtunnels.ms";
-  // backendLink = "https://mcq5cp7n-3002.asse.devtunnels.ms";
-  backendLink = "http://localhost:3000";
+  backendLink = "https://mcq5cp7n-3002.asse.devtunnels.ms";
+  // backendLink = "http://localhost:3000";
 
   isLoading: boolean = false;
   isLoadingShare: boolean = false;
@@ -319,52 +317,6 @@ export class Home implements OnInit {
 
   isSelected(item: LensoItem): boolean {
     return this.selectedItems.includes(item);
-  }
-
-  async fetchPriceAndWeight(): Promise<void> {
-    this.stockService.getWeightList(this.isLensoDB).subscribe({
-      next: (data: LensoWeight[]) => {
-        const weightMap = new Map(
-          data.map(weight => [weight.ItemCode, weight])
-        );
-
-        this.fullItemList.data.forEach((item: LensoItem) => {
-          const itemWeight = weightMap.get(item.ItemCode);
-
-          item.Weight = itemWeight?.Weight ?? -1;
-        });
-
-        this.fetchStocks();
-      },
-      error: (err) => {
-        console.error('Error fetching details:', err);
-      }
-    });
-  }
-
-  async fetchStocks(): Promise<void> {
-    this.stockService.getStockList(this.isLensoDB).subscribe({
-      next: (data: LensoStock[]) => {
-        const stockMap = new Map(
-          data.map(stock => [stock.ItemCode, stock])
-        );
-
-        this.fullItemList.data.forEach((item: LensoItem) => {
-          const stock = stockMap.get(item.ItemCode);
-          if (stock) {
-            item.QtyStatus = stock.QtyStatus;
-          }
-        });
-
-        this.applySort();
-        this.fullStockCount = this.inStockCount();
-        this.emptyStockCount = this.fullItemList.data.length - this.fullStockCount;
-        this.isStockCountReady = true;
-      },
-      error: (err) => {
-        console.error('Error fetching stocks:', err);
-      }
-    });
   }
 
   initializeFilter() {

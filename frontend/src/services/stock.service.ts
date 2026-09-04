@@ -6,9 +6,8 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class StockService {
-    private domain = "http://localhost:3000";
-    // private domain = "https://mcq5cp7n-3002.asse.devtunnels.ms";
-    // private domain = "https://hbctrlpd-3000.asse.devtunnels.ms";
+    // private domain = "http://localhost:3000";
+    private domain = "https://mcq5cp7n-3002.asse.devtunnels.ms";
 
     private itemApiUrl = `${this.domain}/api/item`;
     private itemPCDUrl = `${this.domain}/api/item-category`;
@@ -35,11 +34,6 @@ export class StockService {
         return this.http.post<any>(this.createUserUrl, body);
     }
 
-    getSecuredLoginDetails(username: string, password: string) {
-        const body = { username, password };
-        return this.http.post<any>(this.getSecuredLoginUrl, body);
-    }
-
     getDealerSecuredLoginDetails(username: string, password: string) {
         const body = { username, password };
         return this.http.post<any>(this.getDealerSecuredLoginUrl, body);
@@ -50,26 +44,8 @@ export class StockService {
         return this.http.put<any>(`${this.updateShoppingCartUrl}/${id}`, body);
     }
 
-    getItemList(isLensoDB?: boolean): Observable<any[]> {
-        const dbParam = isLensoDB ? 'lenso' : 'kai_shen';
-        const url = `${this.itemApiUrl}?db=${dbParam}`;
-        return this.http.get<any[]>(url);
-    }
-
     getPCDList(): Observable<any[]> {
         const url = `${this.itemPCDUrl}?db=lenso`;
-        return this.http.get<any[]>(url);
-    }
-
-    getStockList(isLensoDB?: boolean): Observable<any[]> {
-        const dbParam = isLensoDB ? 'lenso' : 'kai_shen';
-        const url = `${this.stockApiUrl}?db=${dbParam}`;
-        return this.http.get<any[]>(url);
-    }
-
-    getWeightList(isLensoDB?: boolean): Observable<any[]> {
-        const dbParam = isLensoDB ? 'lenso' : 'kai_shen';
-        const url = `${this.weightApiUrl}?db=${dbParam}`;
         return this.http.get<any[]>(url);
     }
 
