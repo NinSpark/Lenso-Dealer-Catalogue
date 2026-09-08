@@ -22,7 +22,7 @@ export class AuthService {
       if (res?.token) {
         localStorage.setItem('token', res.token);
         localStorage.setItem('loggedInUser', res.username);
-        localStorage.setItem('sales_agent', res.sale_agent);
+        localStorage.setItem('sales_agent', res.sales_agent);
         localStorage.setItem('id', res.id);
         localStorage.setItem('shopping_cart', res.shopping_cart);
         return true;
