@@ -10,7 +10,7 @@
 
             <div>
                 <input type="password" placeholder="Password" id="password" [(ngModel)]="password"
-                    [ngModelOptions]="{standalone: true}" required [disabled]="isLoading" />
+                    [ngModelOptions]="{standalone: true}" required [disabled]="isLoading" (keyup.enter)="login()" />
             </div>
 
             <button type="button" (click)="login()" [disabled]="isLoading">Login</button>
