@@ -12,4 +12,4 @@ dist/
 *.log
 
 # Environment
-/backend/
+backend/
