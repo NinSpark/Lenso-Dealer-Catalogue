@@ -190,7 +190,7 @@
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
-                            <p class="item-description"><b>{{ item.Description.replace(" RIM", "") }}</b></p>
+                            <p class="item-description"><b>{{ item.Description }}</b></p>
                             <p class="price-section" *ngIf="showPrice">
                                 {{ item.Price ? ('RM' + (item.Price | number:'1.2-2')) : 'Price Unavailable' }}
                             </p>
@@ -281,7 +281,7 @@
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
-                            <p class="item-description"><b>{{ item.Description.replace(" RIM", "") }}</b></p>
+                            <p class="item-description"><b>{{ item.Description }}</b></p>
                             <p class="price-section" *ngIf="showPrice">
                                 {{ item.Price ? ('RM' + (item.Price | number:'1.2-2')) : 'Price Unavailable' }}
                             </p>
@@ -373,7 +373,7 @@
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
-                            <p class="item-description"><b>{{ item.Description.replace(" RIM", "") }}</b></p>
+                            <p class="item-description"><b>{{ item.Description }}</b></p>
                             <p class="price-section" *ngIf="showPrice">
                                 {{ item.Price ? ('RM' + (item.Price | number:'1.2-2')) : 'Price Unavailable' }}
                             </p>
