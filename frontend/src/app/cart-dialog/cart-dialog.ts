@@ -14,6 +14,7 @@ export class CartDialog implements OnInit {
   // backendLink = "https://98j88mtl-3000.asse.devtunnels.ms";
   backendLink = "https://mcq5cp7n-3004.asse.devtunnels.ms";
   // backendLink = "http://localhost:3000";
+  total: number = 0;
 
   salesAgentInfoList: any[] = [
     { name: 'CHK', phone: '60123019232' },
@@ -90,5 +91,10 @@ export class CartDialog implements OnInit {
 
   closeDialog() {
     this.dialogRef.close(this.cartItemList);
+  }
+
+  getTotal(): number {
+    this.total = this.cartItemList.reduce((acc, item) => acc + (item.Price * item.CartQty), 0);
+    return this.total;
   }
 }

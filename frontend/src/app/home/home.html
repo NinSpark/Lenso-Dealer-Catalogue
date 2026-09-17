@@ -60,14 +60,14 @@
                 <span>Sort by Heaviest</span>
             </button>
 
-            <button mat-menu-item (click)="sortBy('qtyHigh')">
-                <mat-icon [style.visibility]="currentSort === 'qtyHigh' ? 'visible' : 'hidden'">check</mat-icon>
-                <span>Qty: High - Low</span>
+            <button mat-menu-item (click)="sortBy('priceHigh')">
+                <mat-icon [style.visibility]="currentSort === 'priceHigh' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Price: High - Low</span>
             </button>
 
-            <button mat-menu-item (click)="sortBy('qtyLow')">
-                <mat-icon [style.visibility]="currentSort === 'qtyLow' ? 'visible' : 'hidden'">check</mat-icon>
-                <span>Qty: Low - High</span>
+            <button mat-menu-item (click)="sortBy('priceLow')">
+                <mat-icon [style.visibility]="currentSort === 'priceLow' ? 'visible' : 'hidden'">check</mat-icon>
+                <span>Price: Low - High</span>
             </button>
         </mat-menu>
 
@@ -86,6 +86,14 @@
             <button *ngIf="fullItemList.data.length > 0" mat-menu-item (click)="clearList()" [disabled]="isLoading">
                 <mat-icon>refresh</mat-icon>
                 <span>Reset List</span>
+            </button>
+            <button mat-menu-item *ngIf="showPrice" (click)="togglePrice(false)">
+                <mat-icon>money_off</mat-icon>
+                <span>Hide Price</span>
+            </button>
+            <button mat-menu-item *ngIf="!showPrice" (click)="togglePrice(true)">
+                <mat-icon>attach_money</mat-icon>
+                <span>Show Price</span>
             </button>
             <button mat-menu-item (click)="logout()">
                 <mat-icon>logout</mat-icon>
@@ -181,8 +189,11 @@
                                     (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
                             </div>
 
-                            <p class="item-description"><b>{{ item.Description }}</b></p>
                             <p class="code-name">{{ item.ItemCode }}</p>
+                            <p class="item-description"><b>{{ item.Description.replace(" RIM", "") }}</b></p>
+                            <p class="price-section" *ngIf="showPrice">
+                                {{ item.Price ? ('RM' + (item.Price | number:'1.2-2')) : 'Price Unavailable' }}
+                            </p>
                         </div>
 
                         <mat-card-content>
@@ -269,8 +280,11 @@
                                     (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
                             </div>
 
-                            <p class="item-description"><b>{{ item.Description }}</b></p>
                             <p class="code-name">{{ item.ItemCode }}</p>
+                            <p class="item-description"><b>{{ item.Description.replace(" RIM", "") }}</b></p>
+                            <p class="price-section" *ngIf="showPrice">
+                                {{ item.Price ? ('RM' + (item.Price | number:'1.2-2')) : 'Price Unavailable' }}
+                            </p>
                         </div>
 
                         <mat-card-content>
@@ -358,8 +372,11 @@
                                     (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
                             </div>
 
-                            <p class="item-description"><b>{{ item.Description }}</b></p>
                             <p class="code-name">{{ item.ItemCode }}</p>
+                            <p class="item-description"><b>{{ item.Description.replace(" RIM", "") }}</b></p>
+                            <p class="price-section" *ngIf="showPrice">
+                                {{ item.Price ? ('RM' + (item.Price | number:'1.2-2')) : 'Price Unavailable' }}
+                            </p>
                         </div>
 
                         <mat-card-content>

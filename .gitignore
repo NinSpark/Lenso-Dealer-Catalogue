@@ -12,5 +12,4 @@ dist/
 *.log
 
 # Environment
-/backend/.env
-/backend/images/
+/backend/

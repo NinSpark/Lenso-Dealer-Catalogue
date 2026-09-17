@@ -355,7 +355,7 @@ app.get('/api/filtered-item', authenticateToken, async (req, res) => {
     let baseQuery = `
       SELECT 
         ITEM.ItemCode, ITEM.Description, ITEM.ItemBrand, ITEM.ItemClass, ITEM.ItemCategory,
-        SUM(DTL.Qty) AS Qty, COALESCE(UOM.Weight, -1) AS Weight
+        SUM(DTL.Qty) AS Qty, COALESCE(UOM.Weight, -1) AS Weight, UOM.Price * 1.40 AS Price
       FROM dbo.Item ITEM
       INNER JOIN dbo.StockDTL DTL ON ITEM.ItemCode = DTL.ItemCode
       INNER JOIN dbo.ItemUOM UOM ON ITEM.ItemCode = UOM.ItemCode

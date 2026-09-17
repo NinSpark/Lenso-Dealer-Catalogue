@@ -80,8 +80,16 @@ mat-dialog-actions {
     font-size: 12px;
 }
 
+.item-class-price {
+    margin-top: 0;
+    font-size: 12px;
+}
+
 /* mobile */
 @media only screen and (max-width: 600px) {
+    .item-class-price {
+        text-align: center;
+    }
 
     .wheel-image {
         width: 100%;
@@ -112,6 +120,10 @@ mat-dialog-actions {
         margin-top: 8px;
     }
 
+    .item-class-price {
+        margin-top: 0;
+    }
+
     .card-content {
         align-items: center;
     }
@@ -131,6 +143,7 @@ mat-dialog-actions {
     .card-header {
         justify-content: start;
         gap: 20px;
+        padding: 12px;
     }
 
     .card-quantity {
@@ -138,6 +151,11 @@ mat-dialog-actions {
         justify-content: start;
         align-items: center;
         gap: 8px;
+    }
+
+    .wheel-image {
+        width: 100%;
+        height: fit-content;
     }
 }
 
@@ -167,4 +185,22 @@ mat-dialog-actions {
     text-decoration: underline;
     color: cadetblue;
     cursor: pointer;
+}
+
+.subtotal-div {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 4px 0 8px;
+    padding: 0 16px 8px 0;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+}
+
+.order-total-text {
+    font-size: 12px;
+    color: #797979;
+}
+
+::ng-deep .mat-mdc-dialog-container-with-actions .mat-mdc-dialog-content {
+    padding: 0 12px;
 }

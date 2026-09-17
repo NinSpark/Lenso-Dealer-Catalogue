@@ -58,7 +58,7 @@ export class Home implements OnInit {
   fullItemList = new MatTableDataSource<LensoItem>();
   isSet: boolean = true;
   showCost: boolean = false;
-  showPrice: boolean = true;
+  showPrice: boolean = false;
   showOOS: boolean = true;
   isMobileView: boolean = true;
   isTabletView: boolean = false;
@@ -232,6 +232,7 @@ export class Home implements OnInit {
   }
 
   applySort() {
+    this.isLoading = true;
     if (this.fullItemList.data.length == 0 || !this.currentSort) return;
 
     switch (this.currentSort) {
@@ -247,11 +248,11 @@ export class Home implements OnInit {
       case 'oldest':
         this.fullItemList.data.sort((a, b) => a.ItemCode.localeCompare(b.ItemCode));
         break;
-      case 'qtyHigh':
-        this.fullItemList.data.sort((a, b) => b.StockQty - a.StockQty);
+      case 'priceHigh':
+        this.fullItemList.data.sort((a, b) => b.Price - a.Price);
         break;
-      case 'qtyLow':
-        this.fullItemList.data.sort((a, b) => a.StockQty - b.StockQty);
+      case 'priceLow':
+        this.fullItemList.data.sort((a, b) => a.Price - b.Price);
         break;
       case 'heaviest':
         this.fullItemList.data.sort((a, b) => {
@@ -268,6 +269,7 @@ export class Home implements OnInit {
         });
         break;
     }
+    this.isLoading = false;
   }
 
   resetFilters(): void {
@@ -720,5 +722,9 @@ export class Home implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
 
     });
+  }
+
+  togglePrice(show: boolean) {
+    this.showPrice = show;
   }
 }

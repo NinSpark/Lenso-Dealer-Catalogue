@@ -19,6 +19,9 @@
                             Type: <b>{{item.ItemClass | titlecase}}</b>, Weight: <b *ngIf="item.Weight > 0">{{
                                 item.Weight | number:'1.2-2' }} kg</b><b *ngIf="item.Weight <= 0">N/A</b>
                         </div>
+                        <div class="item-class-price">
+                            End-user price: RM{{item.Price | number:'1.2-2'}} × {{item.CartQty}} = <b>RM{{ (item.Price * item.CartQty) | number:'1.2-2' }}</b>
+                        </div>
                     </div>
                     <div class="card-quantity">
                         <div class="quantity-options">
@@ -50,5 +53,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
+    <div class="subtotal-div"><span class="order-total-text">Order Total</span> RM{{ getTotal() | number:'1.2-2' }}</div>
     <button class="contact-button" matButton="filled" (click)="whatsAppContact()">WhatsApp Sales Agent</button>
 </mat-dialog-actions>

@@ -152,17 +152,15 @@ mat-card {
 }
 
 .code-name {
-  font-size: 12px;
+  font-size: 10px;
   color: #797979;
   margin: 0;
 }
 
 .price-section {
-  margin-top: 12px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  text-align: center;
+  font-size: 14px;
+  color: #797979;
+  margin: 0;
 }
 
 .set-div {
@@ -276,7 +274,7 @@ mat-card {
   .item-description {
     margin: 0;
     font-size: 12px;
-    padding: 8px 12px 0 12px;
+    padding: 0 12px 0 12px;
     line-height: 1.4;
   }
 
@@ -440,6 +438,10 @@ mat-card {
     font-size: 1rem;
     padding: 4px 8px;
   }
+
+  .item-description {
+    margin: 0;
+  }
 }
 
 /* desktop css */
@@ -452,7 +454,7 @@ mat-card {
   .item-description {
     margin: 0;
     font-size: 14px;
-    padding: 8px 20px 0 20px;
+    padding: 0px 20px;
   }
 
   .info-details {

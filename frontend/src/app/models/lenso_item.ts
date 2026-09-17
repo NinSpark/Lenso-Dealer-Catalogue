@@ -61,7 +61,7 @@ export class LensoItem {
     public StockQty: number,
     public QtyStatus: string,
     // public Cost: number,
-    // public Price: number,
+    public Price: number,
     public Weight: number,
     public imageLoaded: boolean = false,
     public imageExist: boolean = false
