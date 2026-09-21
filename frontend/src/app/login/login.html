@@ -8,9 +8,16 @@
                     [ngModelOptions]="{standalone: true}" required [disabled]="isLoading" />
             </div>
 
-            <div>
-                <input type="password" placeholder="Password" id="password" [(ngModel)]="password"
-                    [ngModelOptions]="{standalone: true}" required [disabled]="isLoading" (keyup.enter)="login()" />
+            <div class="password-container">
+                <input [type]="showPassword ? 'text' : 'password'" placeholder="Password" id="password"
+                    [(ngModel)]="password" [ngModelOptions]="{ standalone: true }" required [disabled]="isLoading"
+                    (keyup.enter)="login()" />
+
+                <button type="button" mat-icon-button (click)="showPassword = !showPassword" [disabled]="isLoading">
+                    <mat-icon>
+                        {{ showPassword ? 'visibility_off' : 'visibility' }}
+                    </mat-icon>
+                </button>
             </div>
 
             <button type="button" (click)="login()" [disabled]="isLoading">Login</button>

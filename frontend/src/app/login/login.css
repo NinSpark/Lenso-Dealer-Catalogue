@@ -11,20 +11,20 @@
 }
 
 .body-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 1;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1;
 }
 
-.body-container > * {
-  position: relative;
-  z-index: 2;
-  color: white;
+.body-container>* {
+    position: relative;
+    z-index: 2;
+    color: white;
 }
 
 .login-container {
@@ -69,7 +69,8 @@ button {
 }
 
 button:hover {
-    background: #721417;;
+    background: #721417;
+    ;
 }
 
 .error {
@@ -101,4 +102,22 @@ button:hover {
         font-size: 14px;
         padding: 8px;
     }
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 45px;
+}
+
+.password-container button {
+    position: absolute;
+    right: 0;
+    background: transparent;
+    color:#a5a5a5;
 }
