@@ -170,7 +170,7 @@ mat-card {
 
 .type-info,
 .size-info,
-.pcd-info,
+.load-info,
 .weight-info {
   display: flex;
   justify-content: center;
@@ -362,7 +362,7 @@ mat-card {
 }
 
 /* tablet css */
-@media only screen and (min-width: 601px) and (max-width: 1025px) {
+@media only screen and (min-width: 601px) and (max-width: 1024px) {
   .tablet-card-div {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -445,7 +445,7 @@ mat-card {
 }
 
 /* desktop css */
-@media only screen and (min-width: 1024.1px) {
+@media only screen and (min-width: 1024px) {
   .body {
     padding: 10px;
     height: calc(100vh - 20px);

@@ -203,16 +203,16 @@
                                         <mat-icon fontIcon="hardware"></mat-icon>
                                         <div>{{ item.ItemClass | titlecase }}</div>
                                     </div>
-                                    <div class="pcd-info">
-                                        <img src="assets/PCD-01-02-01.svg"
-                                            style="width: 24px; height: 24px; margin: 0" />
-                                        <div>{{ item.ItemCategory }}</div>
-                                    </div>
                                     <div class="weight-info">
                                         <img src="assets/weight_filled.svg"
                                             style="width: 24px; height: 24px; margin: 0" />
                                         <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
                                         <div *ngIf="item.Weight == -1">N/A</div>
+                                    </div>
+                                    <div class="load-info">
+                                        <img src="assets/strength.svg" style="width: 24px; height: 24px; margin: 0" />
+                                        <div *ngIf="item.LoadRating > 0">{{ item.LoadRating | number:'1.0-0' }} kg</div>
+                                        <div *ngIf="item.LoadRating == -1">N/A</div>
                                     </div>
                                 </div>
                                 <div class="qty-section">
@@ -294,16 +294,17 @@
                                         <mat-icon fontIcon="hardware"></mat-icon>
                                         <div>{{ item.ItemClass | titlecase }}</div>
                                     </div>
-                                    <!-- <div class="pcd-info">
-                                        <img src="assets/PCD-01-02-01.svg"
-                                            style="width: 24px; height: 24px; margin: 0" />
-                                        <div>{{ item.ItemCategory }}</div>
-                                    </div> -->
                                     <div class="weight-info">
                                         <img src="assets/weight_filled.svg"
                                             style="width: 24px; height: 24px; margin: 0" />
                                         <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
                                         <div *ngIf="item.Weight == -1">N/A</div>
+                                    </div>
+                                    <div class="load-info">
+                                        <img src="assets/strength.svg" style="width: 24px; height: 24px; margin: 0" />
+                                        <div *ngIf="item.LoadRating > 0">{{ item.LoadRating | number:'1.0-0' }} kg
+                                        </div>
+                                        <div *ngIf="item.LoadRating == -1">N/A</div>
                                     </div>
                                 </div>
                                 <div class="qty-section">
@@ -386,16 +387,17 @@
                                         <mat-icon fontIcon="hardware"></mat-icon>
                                         <div>{{ item.ItemClass | titlecase }}</div>
                                     </div>
-                                    <div class="pcd-info">
-                                        <img src="assets/PCD-01-02-01.svg"
-                                            style="width: 24px; height: 24px; margin: 0" />
-                                        <div>{{ item.ItemCategory }}</div>
-                                    </div>
                                     <div class="weight-info">
                                         <img src="assets/weight_filled.svg"
                                             style="width: 24px; height: 24px; margin: 0" />
                                         <div *ngIf="item.Weight > 0">{{ item.Weight | number:'1.2-2' }} kg</div>
                                         <div *ngIf="item.Weight == -1">N/A</div>
+                                    </div>
+                                    <div class="load-info">
+                                        <img src="assets/strength.svg" style="width: 24px; height: 24px; margin: 0" />
+                                        <div *ngIf="item.LoadRating > 0">{{ item.LoadRating | number:'1.0-0' }} kg
+                                        </div>
+                                        <div *ngIf="item.LoadRating == -1">N/A</div>
                                     </div>
                                 </div>
                                 <div class="qty-section">
