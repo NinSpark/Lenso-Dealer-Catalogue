@@ -185,13 +185,12 @@
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
 
-                                <!-- <img class="wheel-image" [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy"> -->
                                 <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
-                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'" [style.cursor]="item.imageExist ? 'pointer' : 'default'"
-                                    [style.userSelect]="item.imageExist ? 'auto' : 'none'" [class.no-image]="!item.imageExist"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)"
-                                    (click)="openLightbox(item)" loading="lazy">
+                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                    [style.cursor]="item.imageExist ? 'pointer' : 'default'"
+                                    [style.userSelect]="item.imageExist ? 'auto' : 'none'"
+                                    [class.no-image]="!item.imageExist" (load)="onImgLoad($event, item)"
+                                    (error)="onImgError($event, item)" (click)="openLightbox(item)" loading="lazy">
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
@@ -280,13 +279,12 @@
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
 
-                                <!-- <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
-                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy"> -->
                                 <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
                                     [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)"
-                                    (click)="openLightbox(item)" loading="lazy">
+                                    [style.cursor]="item.imageExist ? 'pointer' : 'default'"
+                                    [style.userSelect]="item.imageExist ? 'auto' : 'none'"
+                                    [class.no-image]="!item.imageExist" (load)="onImgLoad($event, item)"
+                                    (error)="onImgError($event, item)" (click)="openLightbox(item)" loading="lazy">
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
@@ -377,13 +375,12 @@
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
 
-                                <!-- <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
-                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy"> -->
                                 <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
                                     [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)"
-                                    (click)="openLightbox(item)" loading="lazy">
+                                    [style.cursor]="item.imageExist ? 'pointer' : 'default'"
+                                    [style.userSelect]="item.imageExist ? 'auto' : 'none'"
+                                    [class.no-image]="!item.imageExist" (load)="onImgLoad($event, item)"
+                                    (error)="onImgError($event, item)" (click)="openLightbox(item)" loading="lazy">
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
