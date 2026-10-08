@@ -85,7 +85,9 @@ export class Home implements OnInit {
   ];
 
   pcdList: any[] = [];
-
+  lightboxItem: any = null;
+  previewImageLink: string = '';
+  lightboxLoading: boolean = true;
   private _sort!: MatSort;
 
   @ViewChild(MatSort)
@@ -726,5 +728,51 @@ export class Home implements OnInit {
 
   togglePrice(show: boolean) {
     this.showPrice = show;
+  }
+
+  openLightbox(item: any) {
+    if (!item.imageExist) return;
+    this.lightboxItem = item;
+    this.previewImageLink = this.backendLink + '/images/webp/' + item.ItemCode + '.webp';
+    this.lightboxLoading = true;
+    document.getElementsByClassName('body')[0].classList.add('lightbox-open');
+  }
+
+  closeLightbox() {
+    this.lightboxItem = null;
+    this.previewImageLink = "";
+    this.lightboxLoading = false;
+    document.getElementsByClassName('body')[0].classList.remove('lightbox-open');
+  }
+
+  scrollImage(event: Event, isNext: boolean, itemCode: string) {
+    event.stopPropagation();
+
+    const data = this.fullItemList.data;
+
+    const currentIndex = data.findIndex(
+      item => item.ItemCode === itemCode
+    );
+
+    if (currentIndex === -1) return;
+
+    let newIndex = isNext ? (currentIndex + 1) % data.length : (currentIndex - 1 + data.length) % data.length;
+    while (!data[newIndex].imageExist) {
+      newIndex = isNext ? (newIndex + 1) % data.length : (newIndex - 1 + data.length) % data.length;
+    }
+
+    this.lightboxLoading = true;
+
+    const newItem = data[newIndex];
+    this.lightboxItem = newItem;
+    this.previewImageLink = this.backendLink + '/images/webp/' + newItem.ItemCode + '.webp';
+  }
+
+  onLightboxImageLoad() {
+    this.lightboxLoading = false;
+  }
+
+  onLightboxImageError() {
+    this.lightboxLoading = false;
   }
 }

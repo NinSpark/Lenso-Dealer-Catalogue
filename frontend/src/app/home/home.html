@@ -185,8 +185,13 @@
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
 
-                                <img class="wheel-image" [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                                <!-- <img class="wheel-image" [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy"> -->
+                                <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
+                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'" [style.cursor]="item.imageExist ? 'pointer' : 'default'"
+                                    [style.userSelect]="item.imageExist ? 'auto' : 'none'" [class.no-image]="!item.imageExist"
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)"
+                                    (click)="openLightbox(item)" loading="lazy">
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
@@ -275,9 +280,13 @@
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
 
+                                <!-- <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
+                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy"> -->
                                 <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
                                     [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)"
+                                    (click)="openLightbox(item)" loading="lazy">
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
@@ -368,9 +377,13 @@
                                     <mat-spinner diameter="70"></mat-spinner>
                                 </div>
 
+                                <!-- <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
+                                    [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy"> -->
                                 <img class="wheel-image" [style.width]="item.imageLoaded ? '100%' : '0'"
                                     [src]="backendLink + '/images/webp/' + item.ItemCode + '.webp'"
-                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)" loading="lazy">
+                                    (load)="onImgLoad($event, item)" (error)="onImgError($event, item)"
+                                    (click)="openLightbox(item)" loading="lazy">
                             </div>
 
                             <p class="code-name">{{ item.ItemCode }}</p>
@@ -466,6 +479,33 @@
             <div class="eof text-align-center">E.O.F.</div>
             <mat-divider class="eof-divider"></mat-divider>
         </div>
-
     </div>
 </div>
+
+
+@if (lightboxItem) {
+<div class="lightbox" (click)="closeLightbox()">
+    <button matIconButton class="lightbox-close" (click)="closeLightbox(); $event.stopPropagation()">
+        <mat-icon>close</mat-icon>
+    </button>
+
+    <div class="main-lightbox-div" (click)="$event.stopPropagation()">
+        @if (lightboxLoading) {
+        <mat-spinner></mat-spinner>
+        }
+
+        <img class="lightbox-image" [src]="previewImageLink" (click)="$event.stopPropagation()"
+            [style.display]="lightboxLoading ? 'none' : 'block'" (load)="onLightboxImageLoad()"
+            (error)="onLightboxImageError()">
+        <div class="button-list">
+            <button matIconButton class="lightbox-prev" (click)="scrollImage($event, false, lightboxItem.ItemCode)">
+                <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span class="lightbox-item-code">{{ lightboxItem.Description }}</span>
+            <button matIconButton class="lightbox-next" (click)="scrollImage($event, true, lightboxItem.ItemCode)">
+                <mat-icon>chevron_right</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>
+}

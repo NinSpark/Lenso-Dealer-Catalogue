@@ -23,10 +23,6 @@ img.fallback {
   -webkit-touch-callout: none;
 }
 
-img {
-  border-radius: 8px 8px 0 0;
-}
-
 .main-table-div {
   overflow: auto;
 }
@@ -212,7 +208,13 @@ mat-card {
 }
 
 .wheel-image {
+  border-radius: 8px 8px 0 0;
   object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.wheel-image:not(.no-image):hover {
+  scale: 1.01;
 }
 
 .toggle-card-checkbox {
@@ -576,4 +578,72 @@ mat-card-content {
 
 .upper-divider {
   padding-bottom: 8px;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.main-lightbox-div {
+  text-align: center;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.button-list {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lightbox-prev,
+.lightbox-next {
+  color: white;
+  font-size: 40px;
+}
+
+.lightbox-item-code {
+  color: white;
+  text-align: center;
+}
+
+.body.lightbox-open {
+  overflow: hidden;
+}
+
+.main-lightbox-div {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-lightbox-div mat-spinner {
+  margin: 100px;
 }
